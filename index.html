@@ -17,9 +17,12 @@
 </script>
   <script>
     function handleCredentialResponse(response) {
-      const decoded = parseJwt(response.credential);
-      document.getElementById("email").value = decoded.email;
-    }
+  const decoded = parseJwt(response.credential);
+  window.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("email").value = decoded.email;
+    console.log("Signed in as:", decoded.email);
+  });
+}
 
     function parseJwt(token) {
       const base64Url = token.split('.')[1];
