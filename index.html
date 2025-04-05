@@ -262,9 +262,8 @@ function setUserDetails(user) {
   const requestee = document.getElementById("requestee");
   requestee.innerHTML = `<option value="${user.name}">${user.name}</option>`;
   document.getElementById("department").value = user.department;
-}">${user.name}</option>`;
-  document.getElementById("department").value = user.department;
 }
+
 
   
 document.getElementById("requisitionForm").addEventListener("submit", function (e) {
