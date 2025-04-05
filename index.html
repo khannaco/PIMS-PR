@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="google-signin-client_id" content="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://accounts.google.com/gsi/client" async defer&gt;function handleCredentialResponse(response) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const decoded = parseJwt(response.credential);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("email").value = decoded.email;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function parseJwt(token) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const base64Url = token.split('.')[1];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const jsonPayload = decodeURIComponent(</p>
+<p class="p1"><span class="Apple-converted-space">    </span>atob(base64).split('').map(c =&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>'%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>).join('')</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return JSON.parse(jsonPayload);</p>
+<p class="p1">}</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;AEPL Material Requisition Form&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.item-box {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid #dee2e6;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 1.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: #f8f9fa;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.remove-btn {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid #ffa07a;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #d35400;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.add-btn {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid #1976d2;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #1976d2;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>label {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 0.2rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.required::after {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>content: "*";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: red;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-left: 2px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1">&lt;div class="container mt-4 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div style="position: sticky; top: 0; background-color: white; z-index: 1050; padding-top: 1rem; padding-bottom: 0.5rem;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h2 class="text-center mb-4"&gt;AEPL Material Requisition Form&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="g_id_onload"</p>
+<p class="p1"><span class="Apple-converted-space">     </span>data-client_id="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com"</p>
+<p class="p1"><span class="Apple-converted-space">     </span>data-context="signin"</p>
+<p class="p1"><span class="Apple-converted-space">     </span>data-callback="handleCredentialResponse"</p>
+<p class="p1"><span class="Apple-converted-space">     </span>data-auto_prompt="true"&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p1">&lt;div class="form-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label class="required" for="email"&gt;Email ID&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="email" class="form-control" id="email" name="email" readonly tabindex="-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label class="required" for="requestee"&gt;Staff Name&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select class="form-control" id="requestee" name="requestee"&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label class="required" for="department"&gt;Department&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" class="form-control" id="department" name="department" readonly tabindex="-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;form id="requisitionForm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="itemContainer"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button type="submit" class="btn btn-primary btn-block"&gt;Submit&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/form&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">let itemCount = 0;</p>
+<p class="p1">function addItemBox() {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>itemCount++;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const container = document.getElementById("itemContainer");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const itemBox = document.createElement("div");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>itemBox.className = "item-box";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const today = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const todayStr = today.toISOString().split("T")[0];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defaultDate = new Date(today);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>defaultDate.setDate(today.getDate() + 7);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const defaultDateStr = defaultDate.toISOString().split("T")[0];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>itemBox.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h5&gt;Item ${itemCount}&lt;/h5&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label class="required"&gt;Name / Description&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" class="form-control" name="name_${itemCount}" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label class="required"&gt;Quantity&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="number" class="form-control" name="quantity_${itemCount}" step="1.00" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label class="required"&gt;Unit&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select class="form-control" name="unit_${itemCount}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="pcs"&gt;pcs&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="kg"&gt;kg&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="gms"&gt;gms&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="ft"&gt;ft&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="sqft"&gt;sqft&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="litre"&gt;litre&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="inch"&gt;inch&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="sq inch"&gt;sq inch&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="mm"&gt;mm&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="cm"&gt;cm&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="mtr"&gt;mtr&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Est. Unit Price&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="number" class="form-control" name="unitPrice_${itemCount}" step="1.00"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;GST %&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select class="form-control" name="gst_${itemCount}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="0"&gt;0%&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="5"&gt;5%&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="12"&gt;12%&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="18"&gt;18%&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;option value="28"&gt;28%&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Type&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" class="form-control" name="reqType_${itemCount}" readonly tabindex="-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Suggested Vendor&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" class="form-control" name="vendor_${itemCount}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label class="required"&gt;Target Date&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Est. Total Price&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="number" class="form-control" name="totalPrice_${itemCount}" readonly tabindex="-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Est. Total Incl. GST&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="number" class="form-control" name="totalWithGst_${itemCount}" readonly tabindex="-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Remarks&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;textarea class="form-control" name="remarks_${itemCount}" rows="1"&gt;&lt;/textarea&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;label&gt;Priority&lt;/label&gt;&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="form-check form-check-inline"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;input class="form-check-input" type="checkbox" name="priority_${itemCount}" value="Urgent"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="form-check-label"&gt;Urgent&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="form-check form-check-inline"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;input class="form-check-input" type="checkbox" name="priority_${itemCount}" value="Important"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="form-check-label"&gt;Important&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;label&gt;File Upload&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;input type="file" class="form-control-file" name="photo_${itemCount}" onchange="document.getElementById('fileLabel_${itemCount}').textContent = this.files[0]?.name || 'No file chosen';" style="color: transparent;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;small id="fileLabel_${itemCount}" class="form-text text-muted"&gt;No file chosen&lt;/small&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;label class="required"&gt;Order For&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;input type="text" class="form-control" name="orderFor_${itemCount}" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="form-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="form-group col-md-12 button-row"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>container.appendChild(itemBox);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>updateItemControls();</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function removeItemBox(button) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const box = button.closest(".item-box");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>box.remove();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>itemCount--;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.querySelectorAll(".item-box h5").forEach((h, i) =&gt; h.textContent = `Item ${i + 1}`);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>updateItemControls();</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function updateItemControls() {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const boxes = document.querySelectorAll(".item-box");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>boxes.forEach((box, idx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const row = box.querySelector('.button-row');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>row.innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const wrapper = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>wrapper.className = 'd-flex w-100';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (idx === boxes.length - 1) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const addWrapper = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addWrapper.className = 'mr-auto';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const addBtn = document.createElement('button');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addBtn.type = 'button';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addBtn.className = 'btn add-btn';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addBtn.innerText = '+ Add Item';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addBtn.onclick = addItemBox;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>addWrapper.appendChild(addBtn);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>wrapper.appendChild(addWrapper);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (boxes.length &gt; 1) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const removeWrapper = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>removeWrapper.className = 'ml-auto';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const removeBtn = document.createElement('button');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>removeBtn.type = 'button';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>removeBtn.className = 'btn remove-btn';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>removeBtn.innerText = '- Remove Item';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>removeBtn.onclick = function () { removeItemBox(removeBtn); };</p>
+<p class="p1"><span class="Apple-converted-space">      </span>removeWrapper.appendChild(removeBtn);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>wrapper.appendChild(removeWrapper);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>row.appendChild(wrapper);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">document.addEventListener("DOMContentLoaded", function () {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>addItemBox();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>google.script.run.withSuccessHandler(setUserDetails).getUserInfo();</p>
+<p class="p1">});</p>
+<p class="p2"><br></p>
+<p class="p1">function setUserDetails(user) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("email").value = user.email;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const requestee = document.getElementById("requestee");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>requestee.innerHTML = `&lt;option value="${user.name}"&gt;${user.name}&lt;/option&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("department").value = user.department;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1">document.getElementById("requisitionForm").addEventListener("submit", function (e) {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>e.preventDefault();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const items = [];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>for (let i = 1; i &lt;= itemCount; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>items.push({</p>
+<p class="p1"><span class="Apple-converted-space">      </span>name: document.querySelector(`[name='name_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>quantity: document.querySelector(`[name='quantity_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>unit: document.querySelector(`[name='unit_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>unitPrice: document.querySelector(`[name='unitPrice_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gst: document.querySelector(`[name='gst_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>totalPrice: document.querySelector(`[name='totalPrice_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>totalWithGst: document.querySelector(`[name='totalWithGst_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>reqType: document.querySelector(`[name='reqType_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>vendor: document.querySelector(`[name='vendor_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>neededBy: document.querySelector(`[name='neededBy_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>remarks: document.querySelector(`[name='remarks_${i}']`).value,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>priority: Array.from(document.querySelectorAll(`[name='priority_${i}']:checked`)).map(p =&gt; p.value).join(', '),</p>
+<p class="p1"><span class="Apple-converted-space">      </span>orderFor: document.querySelector(`[name='orderFor_${i}']`).value</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const payload = {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>email: document.getElementById("email").value,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>requestee: document.getElementById("requestee").value,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>department: document.getElementById("department").value,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>items: items</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>google.script.run</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.withSuccessHandler(() =&gt; alert("Form submitted successfully!"))</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.doPost({ postData: { contents: JSON.stringify(payload) } });</p>
+<p class="p1">});</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
