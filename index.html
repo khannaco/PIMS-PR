@@ -278,6 +278,10 @@ window.addEventListener("DOMContentLoaded", function () {
   addItemBox();
 });
 
+document.querySelector("iframe[name='hidden_iframe']").addEventListener("load", function () {
+  alert("Form submitted successfully!");
+  document.getElementById("requisitionForm").reset();
+});
 </script>
 </body>
 </html>
