@@ -294,9 +294,21 @@ document.getElementById("requisitionForm").addEventListener("submit", function (
     items: items
   };
 
-  google.script.run
-    .withSuccessHandler(() => alert("Form submitted successfully!"))
-    .doPost({ postData: { contents: JSON.stringify(payload) } });
+  fetch("https://script.google.com/macros/s/AKfycby07hYue8ezf0glTNUIS-ws9am_jW8UkE1Ji_p5Gmguvl-zbGHQj2wAOzo796sUJx57/exec", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.text())
+  .then(data => {
+    alert("Form submitted successfully!");
+  })
+  .catch(err => {
+    console.error("Submission failed", err);
+    alert("There was an error submitting the form.");
+  });
 });
 </script>
 </body>
