@@ -224,6 +224,7 @@ function addItemBox() {
 
   
   container.appendChild(itemBox);
+  itemBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
   updateItemControls();
 }
 
@@ -300,6 +301,10 @@ window.addEventListener("DOMContentLoaded", function () {
     iframe.addEventListener("load", function () {
       alert("Form submitted successfully!");
       document.getElementById("requisitionForm").reset();
+      const container = document.getElementById("itemContainer");
+      container.innerHTML = "";
+      itemCount = 0;
+      addItemBox();
     });
   }
 });
