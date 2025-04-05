@@ -267,48 +267,7 @@ function setUserDetails(user) {
 
   
 // Submission is now handled natively via form post to Apps Script Web App using iframe to bypass CORS.
-
-  const items = [];
-  for (let i = 1; i <= itemCount; i++) {
-    items.push({
-      name: document.querySelector(`[name='name_${i}']`).value,
-      quantity: document.querySelector(`[name='quantity_${i}']`).value,
-      unit: document.querySelector(`[name='unit_${i}']`).value,
-      unitPrice: document.querySelector(`[name='unitPrice_${i}']`).value,
-      gst: document.querySelector(`[name='gst_${i}']`).value,
-      totalPrice: document.querySelector(`[name='totalPrice_${i}']`).value,
-      totalWithGst: document.querySelector(`[name='totalWithGst_${i}']`).value,
-      reqType: document.querySelector(`[name='reqType_${i}']`).value,
-      vendor: document.querySelector(`[name='vendor_${i}']`).value,
-      neededBy: document.querySelector(`[name='neededBy_${i}']`).value,
-      remarks: document.querySelector(`[name='remarks_${i}']`).value,
-      priority: Array.from(document.querySelectorAll(`[name='priority_${i}']:checked`)).map(p => p.value).join(', '),
-      orderFor: document.querySelector(`[name='orderFor_${i}']`).value
-    });
-  }
-
-  const payload = {
-    email: document.getElementById("email").value,
-    requestee: document.getElementById("requestee").value,
-    department: document.getElementById("department").value,
-    items: items
-  };
-
-  fetch("https://script.google.com/macros/s/AKfycby07hYue8ezf0glTNUIS-ws9am_jW8UkE1Ji_p5Gmguvl-zbGHQj2wAOzo796sUJx57/exec", {
-    method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-  .then(res => res.text())
-  .then(data => {
-    alert("Form submitted successfully!");
-  })
-  .catch(err => {
-    console.error("Submission failed", err);
-    alert("There was an error submitting the form.");
-  });
+// No JavaScript submission needed.
 });
 </script>
 </body>
