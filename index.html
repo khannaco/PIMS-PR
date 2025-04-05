@@ -18,10 +18,14 @@
   <script>
     function handleCredentialResponse(response) {
   const decoded = parseJwt(response.credential);
-  window.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("email").value = decoded.email;
+  const emailInput = document.getElementById("email");
+  if (emailInput) {
+    emailInput.value = decoded.email;
     console.log("Signed in as:", decoded.email);
-  });
+  } else {
+    console.warn("Email field not found.");
+  }
+});
 }
 
     function parseJwt(token) {
@@ -278,9 +282,14 @@ window.addEventListener("DOMContentLoaded", function () {
   addItemBox();
 });
 
-document.querySelector("iframe[name='hidden_iframe']").addEventListener("load", function () {
-  alert("Form submitted successfully!");
-  document.getElementById("requisitionForm").reset();
+window.addEventListener("DOMContentLoaded", function () {
+  const iframe = document.querySelector("iframe[name='hidden_iframe']");
+  if (iframe) {
+    iframe.addEventListener("load", function () {
+      alert("Form submitted successfully!");
+      document.getElementById("requisitionForm").reset();
+    });
+  }
 });
 </script>
 </body>
