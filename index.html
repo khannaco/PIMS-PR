@@ -126,6 +126,9 @@ function addItemBox() {
 
   itemBox.innerHTML = `
     <h5>Item ${itemCount}</h5>
+    <input type="hidden" name="email_${itemCount}" value="${document.getElementById('email').value}">
+    <input type="hidden" name="requestee_${itemCount}" value="${document.getElementById('requestee').value}">
+    <input type="hidden" name="department_${itemCount}" value="${document.getElementById('department').value}">
     <div class="form-row">
       <div class="form-group col-md-5">
         <label class="required">Name / Description</label>
@@ -219,6 +222,7 @@ function addItemBox() {
       <div class="form-group col-md-12 button-row"></div>
     </div>`;
 
+  
   container.appendChild(itemBox);
   updateItemControls();
 }
@@ -264,22 +268,30 @@ function updateItemControls() {
   });
 }
 
-
-
 function setUserDetails(user) {
   const requestee = document.getElementById("requestee");
   requestee.innerHTML = `<option value="${user.name}">${user.name}</option>`;
   document.getElementById("department").value = user.department;
 }
 
-
-  
-// Submission is now handled natively via form post to Apps Script Web App using iframe to bypass CORS.
-// No JavaScript submission needed.
-
-// Ensure first item is loaded after all functions are ready
 window.addEventListener("DOMContentLoaded", function () {
   addItemBox();
+
+  const syncFields = ['email', 'requestee', 'department'];
+  syncFields.forEach(id => {
+    const field = document.getElementById(id);
+    if (field) {
+      field.addEventListener('input', () => {
+        const itemBoxes = document.querySelectorAll('.item-box');
+        itemBoxes.forEach((box, index) => {
+          const hiddenInput = box.querySelector(`input[name='${id}_${index + 1}']`);
+          if (hiddenInput) {
+            hiddenInput.value = field.value;
+          }
+        });
+      });
+    }
+  });
 });
 
 window.addEventListener("DOMContentLoaded", function () {
