@@ -247,13 +247,14 @@ function updateItemControls() {
 
 document.addEventListener("DOMContentLoaded", function () {
   addItemBox();
-  google.script.run.withSuccessHandler(setUserDetails).getUserInfo();
+  
 });
 
 function setUserDetails(user) {
-  document.getElementById("email").value = user.email;
   const requestee = document.getElementById("requestee");
   requestee.innerHTML = `<option value="${user.name}">${user.name}</option>`;
+  document.getElementById("department").value = user.department;
+}">${user.name}</option>`;
   document.getElementById("department").value = user.department;
 }
 
