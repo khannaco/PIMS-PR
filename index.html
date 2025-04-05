@@ -13,9 +13,7 @@
   google.accounts.id.prompt();
 };
 
-document.addEventListener("DOMContentLoaded", function () {
-  addItemBox();
-});
+
 </script>
   <script>
     function handleCredentialResponse(response) {
@@ -271,6 +269,11 @@ function setUserDetails(user) {
   
 // Submission is now handled natively via form post to Apps Script Web App using iframe to bypass CORS.
 // No JavaScript submission needed.
+
+// Ensure first item is loaded after all functions are ready
+window.addEventListener("DOMContentLoaded", function () {
+  addItemBox();
+});
 });
 </script>
 </body>
