@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="google-signin-client_id" content="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  window.onload = () => {
+    google.accounts.id.initialize({
+      client_id: "631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com",
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.prompt();
+  };
+</script>
   <script>
     function handleCredentialResponse(response) {
       const decoded = parseJwt(response.credential);
@@ -59,7 +68,7 @@
      data-client_id="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com"
      data-context="signin"
      data-callback="handleCredentialResponse"
-     data-auto_prompt="true">
+     >
 </div>
 <div class="g_id_signin"
      data-type="standard"
