@@ -95,10 +95,11 @@
     </div>
   </div>
 
-  <form id="requisitionForm">
-    <div id="itemContainer"></div>
-    <button type="submit" class="btn btn-primary btn-block">Submit</button>
-  </form>
+  <form id="requisitionForm" method="POST" target="hidden_iframe" action="https://script.google.com/macros/s/AKfycby07hYue8ezf0glTNUIS-ws9am_jW8UkE1Ji_p5Gmguvl-zbGHQj2wAOzo796sUJx57/exec">
+  <div id="itemContainer"></div>
+  <button type="submit" class="btn btn-primary btn-block">Submit</button>
+</form>
+<iframe name="hidden_iframe" style="display:none;"></iframe>
 </div>
 
 <script>
@@ -265,8 +266,7 @@ function setUserDetails(user) {
 
 
   
-document.getElementById("requisitionForm").addEventListener("submit", function (e) {
-  e.preventDefault();
+// Submission is now handled natively via form post to Apps Script Web App using iframe to bypass CORS.
 
   const items = [];
   for (let i = 1; i <= itemCount; i++) {
