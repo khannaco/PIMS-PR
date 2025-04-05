@@ -1,66 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="google-signin-client_id" content="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script>
-    window.onload = () => {
-      google.accounts.id.initialize({
-        client_id: "631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com",
-        callback: handleCredentialResponse
-      });
-      google.accounts.id.prompt();
-    };
-
-    function handleCredentialResponse(response) {
-      const decoded = parseJwt(response.credential);
-      const emailInput = document.getElementById("email");
-
-      if (emailInput) {
-        emailInput.value = decoded.email;
-        console.log("Signed in as:", decoded.email);
-      } else {
-        console.warn("Email field not found.");
-      }
-    }
-
-    function parseJwt(token) {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-      return JSON.parse(jsonPayload);
-    }
-  </script>
   <title>AEPL Material Requisition Form</title>
+  <!-- External Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <style>
-    .item-box {
-      border: 1px solid #dee2e6;
-      padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
-      background-color: #f8f9fa;
-    }
-    .remove-btn {
-      background-color: white;
-      border: 1px solid #ffa07a;
-      color: #d35400;
-    }
-    .add-btn {
-      background-color: white;
-      border: 1px solid #1976d2;
-      color: #1976d2;
-    }
-    label {
-      margin-bottom: 0.2rem;
-    }
-    .required::after {
-      content: "*";
-      color: red;
-      margin-left: 2px;
-    }
-  </style>
+  <!-- External Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <div class="container mt-4 mb-4">
@@ -102,80 +50,7 @@
     </form>
     <iframe name="hidden_iframe" style="display:none;"></iframe>
   </div>
-
-  <script>
-    let itemCount = 0;
-    function addItemBox() {
-      itemCount++;
-      const container = document.getElementById("itemContainer");
-      const itemBox = document.createElement("div");
-      itemBox.className = "item-box";
-
-      const today = new Date();
-      const todayStr = today.toISOString().split("T")[0];
-      const defaultDate = new Date(today);
-      defaultDate.setDate(today.getDate() + 7);
-      const defaultDateStr = defaultDate.toISOString().split("T")[0];
-
-      itemBox.innerHTML = `
-        <h5>Item ${itemCount}</h5>
-        <div class="form-row">
-          <div class="form-group col-md-5">
-            <label class="required">Name / Description</label>
-            <input type="text" class="form-control" name="name_${itemCount}" required>
-          </div>
-          <div class="form-group col-md-2">
-            <label class="required">Quantity</label>
-            <input type="number" class="form-control" name="quantity_${itemCount}" step="1.00" required>
-          </div>
-          <div class="form-group col-md-2">
-            <label class="required">Unit</label>
-            <select class="form-control" name="unit_${itemCount}">
-              <option value="pcs">pcs</option>
-              <option value="kg">kg</option>
-              <option value="gms">gms</option>
-              <option value="ft">ft</option>
-              <option value="sqft">sqft</option>
-              <option value="litre">litre</option>
-              <option value="inch">inch</option>
-              <option value="sq inch">sq inch</option>
-              <option value="mm">mm</option>
-              <option value="cm">cm</option>
-              <option value="mtr">mtr</option>
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label>Est. Unit Price</label>
-            <input type="number" class="form-control" name="unitPrice_${itemCount}" step="1.00">
-          </div>
-          <div class="form-group col-md-1">
-            <label>GST %</label>
-            <select class="form-control" name="gst_${itemCount}">
-              <option value="0">0%</option>
-              <option value="5">5%</option>
-              <option value="12">12%</option>
-              <option value="18">18%</option>
-              <option value="28">28%</option>
-            </select>
-          </div>
-        </div>
-      `;
-      container.appendChild(itemBox);
-    }
-
-    window.addEventListener("DOMContentLoaded", function () {
-      addItemBox();
-
-      const iframe = document.querySelector("iframe[name='hidden_iframe']");
-      if (iframe) {
-        iframe.addEventListener("load", function () {
-          const emailVal = document.getElementById("email").value;
-          alert("Form submitted successfully!");
-          document.getElementById("requisitionForm").reset();
-          document.getElementById("email").value = emailVal;
-        });
-      }
-    });
-  </script>
+  <!-- External JavaScript -->
+  <script src="js/main.js"></script>
 </body>
 </html>
