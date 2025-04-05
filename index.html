@@ -11,8 +11,11 @@
     callback: handleCredentialResponse
   });
   google.accounts.id.prompt();
-  addItemBox();
 };
+
+document.addEventListener("DOMContentLoaded", function () {
+  addItemBox();
+});
 </script>
   <script>
     function handleCredentialResponse(response) {
