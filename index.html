@@ -17,11 +17,16 @@
   <script>
     function handleCredentialResponse(response) {
   const decoded = parseJwt(response.credential);
-  const emailInput = document.getElementById("email");
-  if (emailInput) {
-    emailInput.value = decoded.email;
-    console.log("Signed in as:", decoded.email);
-  } else {
+  window.addEventListener("load", function () {
+    const emailInput = document.getElementById("email");
+    if (emailInput) {
+      emailInput.value = decoded.email;
+      console.log("Signed in as:", decoded.email);
+    } else {
+      console.warn("Email field not found.");
+    }
+  });
+} else {
     console.warn("Email field not found.");
   }
 } 
@@ -283,19 +288,17 @@ window.addEventListener("DOMContentLoaded", function () {
   const iframe = document.querySelector("iframe[name='hidden_iframe']");
   if (iframe) {
     iframe.addEventListener("load", function () {
+      const emailVal = document.getElementById("email").value;
       alert("Form submitted successfully!");
       document.getElementById("requisitionForm").reset();
+      document.getElementById("email").value = emailVal;
     });
   }
 });
+  }
+});
 
-window.addEventListener("DOMContentLoaded", function () {
-  const iframe = document.querySelector("iframe[name='hidden_iframe']");
-  if (iframe) {
-    iframe.addEventListener("load", function () {
-      alert("Form submitted successfully!");
-      document.getElementById("requisitionForm").reset();
-    });
+
   }
 });
 </script>
