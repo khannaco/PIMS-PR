@@ -10,7 +10,6 @@
     client_id: "631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com",
     callback: handleCredentialResponse
   });
-  google.accounts.id.prompt();
 };
 
 
@@ -73,11 +72,11 @@
 <div class="container mt-4 mb-4">
   <div style="position: sticky; top: 0; background-color: white; z-index: 1050; padding-top: 1rem; padding-bottom: 0.5rem;">
     <h2 class="text-center mb-4">AEPL Material Requisition Form</h2>
-    <div class="g_id_onload"
+    <div id="g_id_onload"
      data-client_id="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com"
      data-context="signin"
      data-callback="handleCredentialResponse"
-     >
+     data-auto_prompt="false">
 </div>
 <div class="g_id_signin"
      data-type="standard"
@@ -280,6 +279,14 @@ function setUserDetails(user) {
 // Ensure first item is loaded after all functions are ready
 window.addEventListener("DOMContentLoaded", function () {
   addItemBox();
+
+  const iframe = document.querySelector("iframe[name='hidden_iframe']");
+  if (iframe) {
+    iframe.addEventListener("load", function () {
+      alert("Form submitted successfully!");
+      document.getElementById("requisitionForm").reset();
+    });
+  }
 });
 
 window.addEventListener("DOMContentLoaded", function () {
