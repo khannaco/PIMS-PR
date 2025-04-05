@@ -6,12 +6,13 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
   window.onload = () => {
-    google.accounts.id.initialize({
-      client_id: "631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com",
-      callback: handleCredentialResponse
-    });
-    google.accounts.id.prompt();
-  };
+  google.accounts.id.initialize({
+    client_id: "631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com",
+    callback: handleCredentialResponse
+  });
+  google.accounts.id.prompt();
+  addItemBox();
+};
 </script>
   <script>
     function handleCredentialResponse(response) {
@@ -254,9 +255,7 @@ function updateItemControls() {
   });
 }
 
-window.addEventListener("load", function () {
-  addItemBox();
-});
+
 
 function setUserDetails(user) {
   const requestee = document.getElementById("requestee");
