@@ -19,7 +19,7 @@
   <script>
 async function fetchEmployeeData(email) {
   try {
-    const url = `https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_WEBAPP_URL_HERE/exec?email=${encodeURIComponent(email)}`;
+    const url = `https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec?email=${encodeURIComponent(email)}`;
     const res = await fetch(url);
     const data = await res.json();
     return data;
