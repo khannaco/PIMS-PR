@@ -103,7 +103,7 @@
     </div>
   </div>
 
-  <form id="requisitionForm">
+  <form id="requisitionForm" method="POST" target="hidden_iframe" action="https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec">
   <div id="itemContainer"></div>
   <button type="submit" class="btn btn-primary btn-block">Submit</button>
 </form>
@@ -300,22 +300,19 @@ window.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.getElementById("requisitionForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
-    try {
-      const form = document.getElementById("requisitionForm");
-      const formData = new FormData(form);
-      const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec", {
-        method: "POST",
-        body: formData
-      });
-      const text = await response.text();
-      alert("Form submitted successfully!\nResponse: " + text);
-
+  const iframe = document.querySelector("iframe[name='hidden_iframe']");
+  if (iframe) {
+    iframe.addEventListener("load", function () {
+      alert("Form submitted successfully!");
       document.getElementById("requisitionForm").reset();
       document.getElementById("itemContainer").innerHTML = "";
       itemCount = 0;
       addItemBox();
+    });
+  }
+});
+
+  
     } catch (error) {
       alert("Submission failed: " + error);
       console.error(error);
