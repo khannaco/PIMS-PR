@@ -281,26 +281,6 @@ window.addEventListener("DOMContentLoaded", function () {
       field.addEventListener('input', () => {
         const itemBoxes = document.querySelectorAll('.item-box');
         itemBoxes.forEach((box, index) => {
-          const hiddenInput = box.querySelector(`input[name='${id}_${index + 1}']`);
-          if (hiddenInput) {
-            hiddenInput.value = field.value;
-          }
-        });
-      });
-    }
-  });
-});
-
-document.getElementById("requisitionForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
-  const email = document.getElementById("email")?.value || "";
-  const requestee = document.getElementById("requestee")?.value || "";
-  const department = document.getElementById("department")?.value || "";
-
-  const itemBoxes = document.querySelectorAll(".item-box");
-  
-
-  itemBoxes.forEach((box, index) => {
     let idx = index + 1;
     const setOrCreateHidden = (name, value) => {
       let input = box.querySelector(`input[name='${name}_${idx}']`);
@@ -315,9 +295,6 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
     setOrCreateHidden("email", email);
     setOrCreateHidden("requestee", requestee);
     setOrCreateHidden("department", department);
-
-    
-    }
   });
 
   try {
