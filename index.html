@@ -324,7 +324,7 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
     if (fileInput && fileInput.files.length > 0) {
       const file = fileInput.files[0];
       const uploadForm = new FormData();
-      uploadForm.append("file", file);
+      uploadForm.append("file", file, file.name);
       uploadForm.append("filename", `photo_${idx}`);
 
       const uploadPromise = fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec?upload=true", {
