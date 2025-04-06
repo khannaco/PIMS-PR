@@ -302,6 +302,8 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
   const department = document.getElementById("department")?.value || "";
 
   const itemBoxes = document.querySelectorAll(".item-box");
+  const uploadPromises = [];
+
   itemBoxes.forEach((box, index) => {
     let idx = index + 1;
     const setOrCreateHidden = (name, value) => {
@@ -317,19 +319,42 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
     setOrCreateHidden("email", email);
     setOrCreateHidden("requestee", requestee);
     setOrCreateHidden("department", department);
+
+    const fileInput = box.querySelector(`input[type='file'][name='photo_${idx}']`);
+    if (fileInput && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
+      uploadForm.append("filename", `photo_${idx}`);
+
+      const uploadPromise = fetch("https://script.google.com/macros/s/AKfycby07hYue8ezf0glTNUIS-ws9am_jW8UkE1Ji_p5Gmguvl-zbGHQj2wAOzo796sUJx57/exec?upload=true", {
+        method: "POST",
+        body: uploadForm
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.url) {
+          setOrCreateHidden("photo", data.url);
+        }
+      });
+
+      uploadPromises.push(uploadPromise);
+    }
   });
 
-  const form = document.getElementById("requisitionForm");
-  const formData = new FormData(form);
-
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec", {
+    await Promise.all(uploadPromises);
+
+    const form = document.getElementById("requisitionForm");
+    const formData = new FormData(form);
+
+    const response = await fetch("https://script.google.com/macros/s/AKfycby07hYue8ezf0glTNUIS-ws9am_jW8UkE1Ji_p5Gmguvl-zbGHQj2wAOzo796sUJx57/exec", {
       method: "POST",
       body: formData
     });
     const text = await response.text();
-    alert("Form submitted successfully!\nResponse: " + text);
-    form.reset();
+    alert("Form submitted successfully!
+Response: " + text);
     document.getElementById("itemContainer").innerHTML = "";
     itemCount = 0;
     addItemBox();
