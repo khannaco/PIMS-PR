@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="google-signin-client_id" content="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- jQuery and jQuery UI for autocomplete -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
 <script>
   window.onload = () => {
   google.accounts.id.initialize({
@@ -441,7 +446,7 @@ function bindAutocomplete(index) {
 window.addEventListener("DOMContentLoaded", async function () {
   await fetchStaticData();
   addItemBox();
-}));
+});
 
 document.getElementById("requisitionForm").addEventListener("submit", async function (e) {
   e.preventDefault();
