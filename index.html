@@ -353,8 +353,8 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
       body: formData
     });
     const text = await response.text();
-    alert("Form submitted successfully!
-Response: " + text);
+    alert("Form submitted successfully!\nResponse: " + text);
+
     document.getElementById("itemContainer").innerHTML = "";
     itemCount = 0;
     addItemBox();
