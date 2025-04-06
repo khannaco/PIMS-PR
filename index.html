@@ -114,6 +114,11 @@ function handleCredentialResponse(response) {
       margin-bottom: 1.5rem;
       background-color: #f8f9fa;
     }
+    .req-type-new {
+  color: red;
+  font-weight: bold;
+}
+
     .remove-btn {
       background-color: white;
       border: 1px solid #ffa07a;
@@ -450,14 +455,16 @@ source: function (request, response) {
           document.querySelector(`[name='unitPrice_${index}']`).value = matched.unitPrice;
           document.querySelector(`[name='gst_${index}']`).value = matched.gst;
           document.querySelector(`[name='vendor_${index}']`).value = matched.vendor;
-          document.querySelector(`[name='reqType_${index}']`).value = 'Repeat';
+          document.querySelector(`[name='reqType_${index}']`).value = 'Repeat';typeInput.style.color = '';
+typeInput.style.fontWeight = '';
           calculateTotals(index);
         }
         return false;
       },
       change: function (event, ui) {
   if (!ui.item) {
-    document.querySelector(`[name='reqType_${index}']`).value = 'New';
+    document.querySelector(`[name='reqType_${index}']`).value = 'New';typeInput.style.color = 'red';
+typeInput.style.fontWeight = 'bold';
     document.querySelector(`[name='unitPrice_${index}']`).value = '';
     document.querySelector(`[name='gst_${index}']`).value = '';
     document.querySelector(`[name='vendor_${index}']`).value = '';
