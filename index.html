@@ -281,40 +281,46 @@ window.addEventListener("DOMContentLoaded", function () {
       field.addEventListener('input', () => {
         const itemBoxes = document.querySelectorAll('.item-box');
         itemBoxes.forEach((box, index) => {
-    let idx = index + 1;
-    const setOrCreateHidden = (name, value) => {
-      let input = box.querySelector(`input[name='${name}_${idx}']`);
-      if (!input) {
-        input = document.createElement("input");
-        input.type = "hidden";
-        input.name = `${name}_${idx}`;
-        box.appendChild(input);
-      }
-      input.value = value;
-    };
-    setOrCreateHidden("email", email);
-    setOrCreateHidden("requestee", requestee);
-    setOrCreateHidden("department", department);
+          let idx = index + 1;
+          const setOrCreateHidden = (name, value) => {
+            let input = box.querySelector(`input[name='${name}_${idx}']`);
+            if (!input) {
+              input = document.createElement("input");
+              input.type = "hidden";
+              input.name = `${name}_${idx}`;
+              box.appendChild(input);
+            }
+            input.value = value;
+          };
+          setOrCreateHidden("email", document.getElementById("email").value);
+          setOrCreateHidden("requestee", document.getElementById("requestee").value);
+          setOrCreateHidden("department", document.getElementById("department").value);
+        });
+      });
+    }
   });
 
-  try {
-        const form = document.getElementById("requisitionForm");
-    const formData = new FormData(form);
-
-    const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec", {
-      method: "POST",
-      body: formData
-    });
-    const text = await response.text();
-alert("Form submitted successfully!\nResponse: " + text);
-
-    document.getElementById("itemContainer").innerHTML = "";
-    itemCount = 0;
-    addItemBox();
-  } catch (error) {
-    alert("Submission failed: " + error);
-    console.error(error);
-  }
+  document.getElementById("requisitionForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    try {
+      const form = document.getElementById("requisitionForm");
+      const formData = new FormData(form);
+      const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec", {
+        method: "POST",
+        body: formData
+      });
+      const text = await response.text();
+      alert("Form submitted successfully!
+Response: " + text);
+      document.getElementById("requisitionForm").reset();
+      document.getElementById("itemContainer").innerHTML = "";
+      itemCount = 0;
+      addItemBox();
+    } catch (error) {
+      alert("Submission failed: " + error);
+      console.error(error);
+    }
+  });
 });
 
   
