@@ -455,7 +455,6 @@ source: function (request, response) {
     document.querySelector(`[name='unitPrice_${index}']`).value = '';
     document.querySelector(`[name='gst_${index}']`).value = '';
     document.querySelector(`[name='vendor_${index}']`).value = '';
-    document.querySelector(`[name='reqType_${index}']`).classList.add('border', 'border-danger');
   }
 }
 
@@ -477,8 +476,6 @@ source: function (request, response) {
       
   
       select: function (event, ui) {
-        document.querySelector(`[name='reqType_${index}']`).classList.remove('border', 'border-danger');
-
         orderInput.value = ui.item.value;
         return false;
       }
