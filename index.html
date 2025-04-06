@@ -56,6 +56,8 @@ function populateStaffDropdown(allUsers, currentEmail) {
   const currentUser = uniqueSortedUsers.find(u => u.email === currentEmail);
   if (currentUser) {
     select.value = currentUser.name;
+    select.dispatchEvent(new Event('change')); // ✅ Force auto-update department + item hidden fields
+
     deptInput.value = currentUser.department;
   }
 
@@ -238,7 +240,7 @@ function addItemBox() {
         <input type="text" class="form-control" name="reqType_${itemCount}" readonly tabindex="-1">
       </div>
       <div class="form-group col-md-4">
-        <label>Suggested Vendor</label>
+        <label>Suggested Vendor <small>(optional, choose from list)</small></label>
         <input type="text" class="form-control" name="vendor_${itemCount}">
       </div>
       <div class="form-group col-md-3">
@@ -256,7 +258,7 @@ function addItemBox() {
     </div>
     <div class="form-row">
       <div class="form-group col-md-7">
-        <label class="required">Order For</label>
+        <label class="required">Order For <small>(choose from list)</small></label>
         <input type="text" class="form-control" name="orderFor_${itemCount}" required>
       </div>
       <div class="form-group col-md-3">
@@ -365,16 +367,7 @@ window.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-  const iframe = document.querySelector("iframe[name='hidden_iframe']");
-  if (iframe) {
-    iframe.addEventListener("load", function () {
-      alert("Form submitted successfully!");
-      document.getElementById("requisitionForm").reset();
-      document.getElementById("itemContainer").innerHTML = "";
-      itemCount = 0;
-      addItemBox();
-    });
-  }
+  
 });
 
   
@@ -412,17 +405,38 @@ function bindAutocomplete(index) {
   const nameInput = document.querySelector(`[name='name_${index}']`);
   const orderInput = document.querySelector(`[name='orderFor_${index}']`);
 
-  const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
+function smartMatch(text, term) {
+  const normText = normalize(text);
+  const words = normalize(term).split(/\s+/);
+  return words.every(word => normText.includes(word));
+}
+
+function highlightMatch(text, term) {
+  const normText = normalize(text);
+  const words = normalize(term).split(/\s+/);
+  let result = text;
+
+  words.forEach(word => {
+    const escaped = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "ig");
+    result = result.replace(regex, "<strong>$1</strong>");
+  });
+
+  return result;
+}
+
+  
   if (nameInput) {
     $(nameInput).autocomplete({
-      source: function (request, response) {
-        const term = normalize(request.term);
-        const matches = iData
-          .filter(i => normalize(i.name).includes(term))
-          .map(i => ({ label: highlightMatch(i.name, request.term), value: i.name }));
-        response(matches);
-      },
+
+source: function (request, response) {
+  const matches = iData
+    .filter(i => smartMatch(i.name, request.term))
+    .map(i => ({ label: highlightMatch(i.name, request.term), value: i.name }));
+  response(matches);
+},
       focus: function (event, ui) {
         event.preventDefault();
         $(nameInput).val(ui.item.value);
@@ -452,13 +466,16 @@ function bindAutocomplete(index) {
 
   if (orderInput) {
     $(orderInput).autocomplete({
-      source: function (request, response) {
-        const term = normalize(request.term);
-        const matches = cmsItems
-          .filter(item => normalize(item).includes(term))
-          .map(item => ({ label: highlightMatch(item, request.term), value: item }));
-        response(matches);
-      },
+
+source: function (request, response) {
+  const matches = cmsItems
+    .filter(item => smartMatch(item, request.term))
+    .map(item => ({ label: highlightMatch(item, request.term), value: item }));
+  response(matches);
+},
+
+      
+  
       select: function (event, ui) {
         orderInput.value = ui.item.value;
         return false;
@@ -467,21 +484,48 @@ function bindAutocomplete(index) {
       return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
     };
   }
+if (orderInput) {
+  orderInput.addEventListener("blur", function () {
+    const match = cmsItems.find(item => normalize(item) === normalize(orderInput.value));
+    if (!match) {
+      alert("Please select a valid 'Order For' from the list.");
+      orderInput.value = "";
+      orderInput.focus();
+    }
+  });
+}
 
+
+
+  
   const qty = document.querySelector(`[name='quantity_${index}']`);
   const price = document.querySelector(`[name='unitPrice_${index}']`);
   const gst = document.querySelector(`[name='gst_${index}']`);
+const vendorInput = document.querySelector(`[name='vendor_${index}']`);
+if (vendorInput) {
+  const vendors = [...new Set(iData.map(i => i.vendor).filter(Boolean))];
+
+  $(vendorInput).autocomplete({
+    source: function (request, response) {
+      const matches = vendors
+        .filter(v => smartMatch(v, request.term))
+        .map(v => ({ label: highlightMatch(v, request.term), value: v }));
+      response(matches);
+    },
+    select: function (event, ui) {
+      vendorInput.value = ui.item.value;
+      return false;
+    }
+  }).autocomplete("instance")._renderItem = function (ul, item) {
+    return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
+  };
+}
 
   if (qty) qty.addEventListener("input", () => calculateTotals(index));
   if (price) price.addEventListener("input", () => calculateTotals(index));
   if (gst) gst.addEventListener("change", () => calculateTotals(index));
 }
 
-function highlightMatch(text, term) {
-  const escaped = term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  const regex = new RegExp(escaped, "i");
-  return text.replace(regex, match => `<strong>${match}</strong>`);
-}
 
 
 // Fetch and add on page load
@@ -494,6 +538,8 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
   e.preventDefault();
 
   const form = e.target;
+  form.querySelector("button[type='submit']").disabled = true;
+
   const formData = new FormData(form);
   const email = document.getElementById("email").value;
   const requestee = document.getElementById("requestee").value;
@@ -524,6 +570,8 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
   } catch (error) {
     console.error("Submission error:", error);
     alert("Submission failed. Please try again.");
+    form.querySelector("button[type='submit']").disabled = false;
+
   }
 });
 </script>
