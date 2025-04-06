@@ -323,7 +323,7 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
   const formData = new FormData(form);
 
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycby07hYue8ezf0glTNUIS-ws9am_jW8UkE1Ji_p5Gmguvl-zbGHQj2wAOzo796sUJx57/exec", {
+    const response = await fetch("https://httpbin.org/post", {
       method: "POST",
       body: formData
     });
