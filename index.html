@@ -121,14 +121,14 @@ function handleCredentialResponse(response) {
   color: red;
   font-weight: bold;
 }
-/* Hide steppers only for GST fields */
-input[name^="gst_"]::-webkit-outer-spin-button,
-input[name^="gst_"]::-webkit-inner-spin-button {
+/* Hide steppers only for  fields */
+input[name^="_"]::-webkit-outer-spin-button,
+input[name^="_"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[name^="gst_"] {
+input[name^="_"] {
   -moz-appearance: textfield; /* Firefox */
 }
 
@@ -244,10 +244,8 @@ function addItemBox() {
 <div class="form-group col-md-1">
   <label>GST%</label>
   <div class="input-group">
-    <input type="number" class="form-control" name="gst_${itemCount}" step="1" min="0" max="100">
-    <div><span>%</span>
-</div>
-
+    <input type="number" class="form-control" name="gst_${itemCount}" step="1" min="0" max="100"<div><span>%</span></div>>
+    <div><span>%</span></div>
   </div>
 </div>
 
