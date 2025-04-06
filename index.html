@@ -331,12 +331,18 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
         method: "POST",
         body: uploadForm
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.url) {
-          setOrCreateHidden("photo", data.url);
-        }
-      });
+      .then(res => res.text())
+.then(text => {
+  try {
+    const data = JSON.parse(text);
+    if (data.success && data.url) {
+      setOrCreateHidden("photo", data.url);
+    }
+  } catch (err) {
+    console.error("Upload failed (invalid JSON):", text);
+  }
+});
+
 
       uploadPromises.push(uploadPromise);
     }
@@ -353,7 +359,7 @@ document.getElementById("requisitionForm").addEventListener("submit", async func
       body: formData
     });
     const text = await response.text();
-    alert("Form submitted successfully!\nResponse: " + text);
+alert("Form submitted successfully!\nResponse: " + text);
 
     document.getElementById("itemContainer").innerHTML = "";
     itemCount = 0;
