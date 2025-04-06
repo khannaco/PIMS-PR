@@ -15,17 +15,66 @@
 
 
 </script>
+
   <script>
-    function handleCredentialResponse(response) {
+async function fetchEmployeeData(email) {
+  try {
+    const url = `https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_WEBAPP_URL_HERE/exec?email=${encodeURIComponent(email)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return { error: "Network issue" };
+  }
+}
+
+function populateStaffDropdown(allUsers, currentEmail) {
+  const select = document.getElementById("requestee");
+  const deptInput = document.getElementById("department");
+
+  select.innerHTML = "";
+
+  allUsers.forEach(user => {
+    const option = document.createElement("option");
+    option.value = user.name;
+    option.textContent = user.name;
+    option.dataset.email = user.email;
+    option.dataset.department = user.department;
+    select.appendChild(option);
+  });
+
+  const currentUser = allUsers.find(u => u.email === currentEmail);
+  if (currentUser) {
+    select.value = currentUser.name;
+    deptInput.value = currentUser.department;
+  }
+
+  select.addEventListener("change", function () {
+    const selected = Array.from(select.options).find(opt => opt.value === this.value);
+    if (selected) {
+      deptInput.value = selected.dataset.department;
+    }
+  });
+}
+
+function handleCredentialResponse(response) {
   const decoded = parseJwt(response.credential);
   const emailInput = document.getElementById("email");
   if (emailInput) {
     emailInput.value = decoded.email;
-    console.log("Signed in as:", decoded.email);
-  } else {
-    console.warn("Email field not found.");
+    fetchEmployeeData(decoded.email).then(data => {
+      if (data.error) {
+        alert("Unauthorized access. Your email is not registered.");
+        document.getElementById("requisitionForm").style.display = "none";
+      } else {
+        populateStaffDropdown(data.allUsers, decoded.email);
+        document.getElementById("requisitionForm").style.display = "block";
+      }
+    });
   }
-} 
+}
+ 
 
 
     function parseJwt(token) {
