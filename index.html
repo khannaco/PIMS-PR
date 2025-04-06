@@ -40,7 +40,11 @@ function populateStaffDropdown(allUsers, currentEmail) {
 
   select.innerHTML = "";
 
-  allUsers.forEach(user => {
+  const uniqueSortedUsers = Array.from(
+    new Map(allUsers.map(u => [u.name, u])).values()
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
+  uniqueSortedUsers.forEach(user => {
     const option = document.createElement("option");
     option.value = user.name;
     option.textContent = user.name;
@@ -49,7 +53,7 @@ function populateStaffDropdown(allUsers, currentEmail) {
     select.appendChild(option);
   });
 
-  const currentUser = allUsers.find(u => u.email === currentEmail);
+  const currentUser = uniqueSortedUsers.find(u => u.email === currentEmail);
   if (currentUser) {
     select.value = currentUser.name;
     deptInput.value = currentUser.department;
@@ -59,6 +63,11 @@ function populateStaffDropdown(allUsers, currentEmail) {
     const selected = Array.from(select.options).find(opt => opt.value === this.value);
     if (selected) {
       deptInput.value = selected.dataset.department;
+      document.querySelectorAll('.item-box').forEach((box, index) => {
+        const idx = index + 1;
+        const input = box.querySelector(`input[name='department_${idx}']`);
+        if (input) input.value = selected.dataset.department;
+      });
     }
   });
 }
@@ -246,6 +255,10 @@ function addItemBox() {
       </div>
     </div>
     <div class="form-row">
+      <div class="form-group col-md-7">
+        <label class="required">Order For</label>
+        <input type="text" class="form-control" name="orderFor_${itemCount}" required>
+      </div>
       <div class="form-group col-md-3">
         <label>Remarks</label>
         <textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea>
@@ -263,11 +276,9 @@ function addItemBox() {
       </div>
       
       
-      <div class="form-group col-md-5">
-  <label class="required">Order For</label>
-  <input type="text" class="form-control" name="orderFor_${itemCount}" required>
-      </div>
+      
     </div>
+    <hr style='border-top: 2px dashed #ccc; margin-top: 1.5rem;'>
     <div class="form-row">
       <div class="form-group col-md-12 button-row"></div>
     </div>`;
@@ -327,7 +338,6 @@ function setUserDetails(user) {
 
 window.addEventListener("DOMContentLoaded", async function () {
   await fetchStaticData();
-  addItemBox();
 
   const syncFields = ['email', 'requestee', 'department'];
   syncFields.forEach(id => {
@@ -402,10 +412,23 @@ function bindAutocomplete(index) {
   const nameInput = document.querySelector(`[name='name_${index}']`);
   const orderInput = document.querySelector(`[name='orderFor_${index}']`);
 
+  const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
   if (nameInput) {
     $(nameInput).autocomplete({
-      source: iData.map(i => i.name),
+      source: function (request, response) {
+        const term = normalize(request.term);
+        const matches = iData
+          .filter(i => normalize(i.name).includes(term))
+          .map(i => ({ label: highlightMatch(i.name, request.term), value: i.name }));
+        response(matches);
+      },
+      focus: function (event, ui) {
+        event.preventDefault();
+        $(nameInput).val(ui.item.value);
+      },
       select: function (event, ui) {
+        $(nameInput).val(ui.item.value);
         const matched = iData.find(i => i.name === ui.item.value);
         if (matched) {
           document.querySelector(`[name='unit_${index}']`).value = matched.unit;
@@ -415,23 +438,34 @@ function bindAutocomplete(index) {
           document.querySelector(`[name='reqType_${index}']`).value = 'Repeat';
           calculateTotals(index);
         }
+        return false;
       },
       change: function (event, ui) {
         if (!ui.item) {
           document.querySelector(`[name='reqType_${index}']`).value = 'New';
         }
       }
-    });
+    }).autocomplete("instance")._renderItem = function (ul, item) {
+      return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
+    };
   }
 
   if (orderInput) {
     $(orderInput).autocomplete({
-      source: cmsItems,
-      minLength: 1,
+      source: function (request, response) {
+        const term = normalize(request.term);
+        const matches = cmsItems
+          .filter(item => normalize(item).includes(term))
+          .map(item => ({ label: highlightMatch(item, request.term), value: item }));
+        response(matches);
+      },
       select: function (event, ui) {
         orderInput.value = ui.item.value;
+        return false;
       }
-    });
+    }).autocomplete("instance")._renderItem = function (ul, item) {
+      return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
+    };
   }
 
   const qty = document.querySelector(`[name='quantity_${index}']`);
@@ -442,6 +476,13 @@ function bindAutocomplete(index) {
   if (price) price.addEventListener("input", () => calculateTotals(index));
   if (gst) gst.addEventListener("change", () => calculateTotals(index));
 }
+
+function highlightMatch(text, term) {
+  const escaped = term.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const regex = new RegExp(escaped, "i");
+  return text.replace(regex, match => `<strong>${match}</strong>`);
+}
+
 
 // Fetch and add on page load
 window.addEventListener("DOMContentLoaded", async function () {
