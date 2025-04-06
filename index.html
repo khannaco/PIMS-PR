@@ -152,11 +152,11 @@ function handleCredentialResponse(response) {
     </div>
   </div>
 
-  <form id="requisitionForm" method="POST" target="hidden_iframe" action="https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec">
+  <form id="requisitionForm">
   <div id="itemContainer"></div>
   <button type="submit" class="btn btn-primary btn-block">Submit</button>
 </form>
-<iframe name="hidden_iframe" style="display:none;"></iframe>
+
 </div>
 
 <script>
@@ -365,5 +365,120 @@ window.addEventListener("DOMContentLoaded", function () {
 
   
 </script>
+<script>
+let iData = [];
+let cmsItems = [];
+
+async function fetchStaticData() {
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec?action=getStaticData");
+    const data = await response.json();
+    iData = data.iData;
+    cmsItems = data.cmsItems;
+  } catch (err) {
+    console.error("Error loading data:", err);
+  }
+}
+
+function calculateTotals(index) {
+  const qty = parseFloat(document.querySelector(`[name='quantity_${index}']`)?.value || 0);
+  const price = parseFloat(document.querySelector(`[name='unitPrice_${index}']`)?.value || 0);
+  const gst = parseFloat(document.querySelector(`[name='gst_${index}']`)?.value || 0);
+
+  const total = qty * price;
+  const totalGst = total * (1 + gst / 100);
+
+  document.querySelector(`[name='totalPrice_${index}']`).value = total.toFixed(2);
+  document.querySelector(`[name='totalWithGst_${index}']`).value = totalGst.toFixed(2);
+}
+
+function bindAutocomplete(index) {
+  const nameInput = document.querySelector(`[name='name_${index}']`);
+  const orderInput = document.querySelector(`[name='orderFor_${index}']`);
+
+  if (nameInput) {
+    $(nameInput).autocomplete({
+      source: iData.map(i => i.name),
+      select: function (event, ui) {
+        const matched = iData.find(i => i.name === ui.item.value);
+        if (matched) {
+          document.querySelector(`[name='unit_${index}']`).value = matched.unit;
+          document.querySelector(`[name='unitPrice_${index}']`).value = matched.unitPrice;
+          document.querySelector(`[name='gst_${index}']`).value = matched.gst;
+          document.querySelector(`[name='vendor_${index}']`).value = matched.vendor;
+          document.querySelector(`[name='reqType_${index}']`).value = 'Repeat';
+          calculateTotals(index);
+        }
+      },
+      change: function (event, ui) {
+        if (!ui.item) {
+          document.querySelector(`[name='reqType_${index}']`).value = 'New';
+        }
+      }
+    });
+  }
+
+  if (orderInput) {
+    $(orderInput).autocomplete({
+      source: cmsItems,
+      minLength: 1,
+      select: function (event, ui) {
+        orderInput.value = ui.item.value;
+      }
+    });
+  }
+
+  const qty = document.querySelector(`[name='quantity_${index}']`);
+  const price = document.querySelector(`[name='unitPrice_${index}']`);
+  const gst = document.querySelector(`[name='gst_${index}']`);
+
+  if (qty) qty.addEventListener("input", () => calculateTotals(index));
+  if (price) price.addEventListener("input", () => calculateTotals(index));
+  if (gst) gst.addEventListener("change", () => calculateTotals(index));
+}
+
+// Fetch and add on page load
+window.addEventListener("DOMContentLoaded", async function () {
+  await fetchStaticData();
+});
+
+document.getElementById("requisitionForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = new FormData(form);
+  const email = document.getElementById("email").value;
+  const requestee = document.getElementById("requestee").value;
+  const department = document.getElementById("department").value;
+
+  document.querySelectorAll(".item-box").forEach((box, i) => {
+    const index = i + 1;
+    formData.set(`email_${index}`, email);
+    formData.set(`requestee_${index}`, requestee);
+    formData.set(`department_${index}`, department);
+  });
+
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec", {
+      method: "POST",
+      body: formData
+    });
+    const text = await response.text();
+    if (text.trim().toLowerCase() === "success") {
+      alert("Form submitted successfully!");
+      form.reset();
+      document.getElementById("itemContainer").innerHTML = "";
+      itemCount = 0;
+      addItemBox();
+    } else {
+      alert("Error from server: " + text);
+    }
+  } catch (error) {
+    console.error("Submission error:", error);
+    alert("Submission failed. Please try again.");
+  }
+});
+</script>
 </body>
 </html>
+
