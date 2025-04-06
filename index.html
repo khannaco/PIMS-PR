@@ -223,10 +223,16 @@ function addItemBox() {
         <label>Est. Unit Price</label>
         <input type="number" class="form-control" name="unitPrice_${itemCount}" step="1.00">
       </div>
-      <div class="form-group col-md-1">
-        <label>GST%</label>
-  <input type="number" class="form-control" name="gst_${itemCount}" step="0.01">
+<div class="form-group col-md-1">
+  <label>GST%</label>
+  <div class="input-group">
+    <input type="number" class="form-control" name="gst_${itemCount}" step="1" min="0" max="100">
+    <div class="input-group-append">
+      <span class="input-group-text">%</span>
+    </div>
+  </div>
 </div>
+
 
       </div>
     </div>
