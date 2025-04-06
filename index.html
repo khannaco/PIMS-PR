@@ -440,7 +440,8 @@ function bindAutocomplete(index) {
 // Fetch and add on page load
 window.addEventListener("DOMContentLoaded", async function () {
   await fetchStaticData();
-});
+  addItemBox();
+}));
 
 document.getElementById("requisitionForm").addEventListener("submit", async function (e) {
   e.preventDefault();
