@@ -43,17 +43,25 @@ function populateStaffDropdown(allUsers, currentEmail) {
 
   select.innerHTML = "";
 
+  // Sort users alphabetically by name
   const sortedUsers = allUsers.sort((a, b) => a.name.localeCompare(b.name));
 
+  // Use a Set to track added names
+  const seenNames = new Set();
 
   sortedUsers.forEach(user => {
-    const option = document.createElement("option");
-    option.value = user.name;
-    option.textContent = user.name;
-    option.dataset.email = user.email;
-    option.dataset.department = user.department;
-    select.appendChild(option);
+    if (!seenNames.has(user.name)) {
+      seenNames.add(user.name);
+
+      const option = document.createElement("option");
+      option.value = user.name;
+      option.textContent = user.name;
+      option.dataset.email = user.email;
+      option.dataset.department = user.department;
+      select.appendChild(option);
+    }
   });
+});
 
 const currentUser = sortedUsers.find(u => u.email === currentEmail);
 
