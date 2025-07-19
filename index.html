@@ -1,384 +1,1285 @@
 <!DOCTYPE html>
+
 <html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>AEPL Material Requisition Form</title>
-  
-  <meta name="google-signin-client_id" content="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-  <style>
-    body { background-color: #e9ecef; }
-    .container { max-width: 1200px; }
-    .item-box {
-      border: 1px solid #dee2e6;
-      padding: 1.25rem;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .req-type-new { color: red; font-weight: bold; }
-    label { font-weight: 500; }
-    .required::after { content: "*"; color: red; margin-left: 2px; }
-    
-    /* Image Preview Style */
-    .image-preview-container {
-        width: 100px;
-        height: 80px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #f8f9fa;
-        margin-top: 2rem;
-    }
-    .image-preview {
-        max-width: 100%;
-        max-height: 100%;
-        display: none; /* Hidden by default */
-    }
-    .image-preview.visible { display: block; }
-    
-    /* Loading Spinner */
-    #loadingSpinner {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.8);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-    }
-    .spinner-border { width: 3rem; height: 3rem; }
-    
-    /* Autocomplete highlighting */
-    .ui-autocomplete .ui-menu-item strong { color: #007bff; }
-  </style>
-</head>
-<body>
+  <meta charset="UTF-8">
 
-<div id="loadingSpinner">
-    <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
-    <p class="mt-2 font-weight-bold">Loading Data...</p>
-</div>
+  <meta name="google-signin-client_id" content="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com">
 
-<div class="container mt-4 mb-4">
-  <div style="position: sticky; top: 0; background-color: #e9ecef; z-index: 1000; padding: 1rem 0;">
-    <h2 class="text-center mb-3">AEPL Material Requisition Form</h2>
-    <div id="auth-section" class="bg-white p-3 rounded shadow-sm">
-      <div class="g_id_onload"
-        data-client_id="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com"
-        data-context="signin"
-        data-callback="handleCredentialResponse">
-      </div>
-      <div class="g_id_signin" data-type="standard"></div>
-      
-      <div id="userInfo" style="display: none;">
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <label class="required" for="email">Email ID</label>
-            <input type="email" class="form-control" id="email" name="email" readonly>
-          </div>
-          <div class="form-group col-md-4">
-            <label class="required" for="requestee">Staff Name</label>
-            <select class="form-control" id="requestee" name="requestee"></select>
-          </div>
-          <div class="form-group col-md-4">
-            <label class="required" for="department">Department</label>
-            <input type="text" class="form-control" id="department" name="department" readonly>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <form id="requisitionForm" style="display: none;">
-    <div id="itemContainer"></div>
-    <button type="submit" class="btn btn-primary btn-lg btn-block mt-3">Submit Requisition</button>
-  </form>
-</div>
+  <!-- jQuery and jQuery UI for autocomplete -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+
 
 <script>
-// --- Global Variables ---
-// Please double-check this URL. It must be the correct deployment URL and should NOT end with a slash (/).
-const SCRIPT_URL_GET = "https://script.google.com/macros/s/AKfycbzzA73rqV7QtHo-bbr7pbW3wUAc7XkWoJSEi7XljKGb2cjCZ1MKeYzK5zaxULbB5rD9QQ/exec";
-// IMPORTANT: This URL must be for the Apps Script that will RECEIVE the form data via POST.
-const SCRIPT_URL_POST = "ADD_YOUR_POST_SCRIPT_URL_HERE"; 
 
-let itemCount = 0;
-let productData = [];
-let employeeData = [];
-let orderForData = [];
+  window.onload = () => {
 
-// --- Helper Functions ---
-function normalize(str) {
-    return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
-}
+  google.accounts.id.initialize({
 
-function smartMatch(text, term) {
-    const normText = normalize(text);
-    const words = normalize(term).split(/\s+/).filter(w => w.length > 0);
-    return words.every(word => normText.includes(word));
-}
+    client_id: "631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com",
 
-function highlightMatch(text, term) {
-    if (!text || !term) return text;
-    let newText = text;
-    const words = term.split(/\s+/).filter(w => w.length > 0);
-    words.forEach(word => {
-        const regex = new RegExp(`(${word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
-        newText = newText.replace(regex, '<strong>$1</strong>');
-    });
-    return newText;
-}
+    callback: handleCredentialResponse
 
-function parseJwt(token) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-    return JSON.parse(jsonPayload);
-}
+  });
 
-// --- Authentication and Data Fetching ---
-window.onload = () => {
-  google.accounts.id.initialize({
-    client_id: "631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com",
-    callback: handleCredentialResponse
-  });
-  google.accounts.id.prompt();
+  google.accounts.id.prompt();
+
 };
 
+
+
+
+
+</script>
+
+
+
+  <script>
+
+async function fetchEmployeeData(email) {
+
+  try {
+
+    const url = `https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec?email=${encodeURIComponent(email)}`;
+
+    const res = await fetch(url);
+
+    const data = await res.json();
+
+    return data;
+
+  } catch (error) {
+
+    console.error("Fetch error:", error);
+
+    return { error: "Network issue" };
+
+  }
+
+}
+
+
+
+function populateStaffDropdown(allUsers, currentEmail) {
+
+  const select = document.getElementById("requestee");
+
+  const deptInput = document.getElementById("department");
+
+
+
+  select.innerHTML = "";
+
+
+
+  // Sort users alphabetically by name
+
+  const sortedUsers = allUsers.sort((a, b) => a.name.localeCompare(b.name));
+
+
+
+  // Use a Set to track added names
+
+  const seenNames = new Set();
+
+
+
+  sortedUsers.forEach(user => {
+
+    if (!seenNames.has(user.name)) {
+
+      seenNames.add(user.name);
+
+
+
+      const option = document.createElement("option");
+
+      option.value = user.name;
+
+      option.textContent = user.name;
+
+      option.dataset.email = user.email;
+
+      option.dataset.department = user.department;
+
+      select.appendChild(option);
+
+    }
+
+  });
+
+
+
+
+
+const currentUser = sortedUsers.find(u => u.email === currentEmail);
+
+
+
+  if (currentUser) {
+
+    select.value = currentUser.name;
+
+    select.dispatchEvent(new Event('change')); // ✅ Force auto-update department + item hidden fields
+
+
+
+    deptInput.value = currentUser.department;
+
+  }
+
+
+
+  select.addEventListener("change", function () {
+
+    const selected = Array.from(select.options).find(opt => opt.value === this.value);
+
+    if (selected) {
+
+      deptInput.value = selected.dataset.department;
+
+      document.querySelectorAll('.item-box').forEach((box, index) => {
+
+        const idx = index + 1;
+
+        const input = box.querySelector(`input[name='department_${idx}']`);
+
+        if (input) input.value = selected.dataset.department;
+
+      });
+
+    }
+
+  });
+
+}
+
+
+
 function handleCredentialResponse(response) {
-  const decoded = parseJwt(response.credential);
-  document.getElementById("email").value = decoded.email;
-  document.querySelector(".g_id_signin").style.display = "none";
-  document.getElementById("userInfo").style.display = "block";
-  fetchInitialData(decoded.email);
+
+  const decoded = parseJwt(response.credential);
+
+  const emailInput = document.getElementById("email");
+
+  if (emailInput) {
+
+    emailInput.value = decoded.email;
+
+    fetchEmployeeData(decoded.email).then(data => {
+
+      if (data.error) {
+
+        alert("Unauthorized access. Your email is not registered.");
+
+        document.getElementById("requisitionForm").style.display = "none";
+
+      } else {
+
+        populateStaffDropdown(data.allUsers, decoded.email);
+
+        document.getElementById("requisitionForm").style.display = "block";
+
+      }
+
+    });
+
+  }
+
 }
 
-async function fetchInitialData(email) {
-  try {
-    const res = await fetch(SCRIPT_URL_GET);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}. Check Apps Script URL and deployment.`);
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    
-    productData = data.productData;
-    employeeData = data.employeeData;
-    orderForData = data.orderForData;
+ 
 
-    const currentUser = employeeData.find(u => u.email === email);
-    if (!currentUser) {
-        alert("Unauthorized access. Your email is not registered in the employee directory.");
-        document.getElementById("loadingSpinner").style.display = "none";
-        return;
-    }
 
-    populateStaffDropdown(currentUser);
-    document.getElementById("requisitionForm").style.display = "block";
-    addItemBox();
 
-  } catch (error) {
-    console.error("Fetch error:", error);
-    alert(`Failed to load initial data: ${error.message}`);
-  } finally {
-    document.getElementById("loadingSpinner").style.display = "none";
-  }
+
+
+    function parseJwt(token) {
+
+      const base64Url = token.split('.')[1];
+
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+      const jsonPayload = decodeURIComponent(
+
+        atob(base64).split('').map(c =>
+
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+
+        ).join('')
+
+      );
+
+      return JSON.parse(jsonPayload);
+
+    }
+
+  </script>
+
+  <title>AEPL Material Requisition Form</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <style>
+
+    .item-box {
+
+      border: 1px solid #dee2e6;
+
+      padding: 1rem;
+
+      border-radius: 10px;
+
+      margin-bottom: 1.5rem;
+
+      background-color: #f8f9fa;
+
+    }
+
+    .req-type-new {
+
+  color: red;
+
+  font-weight: bold;
+
 }
 
-function populateStaffDropdown(currentUser) {
-  const select = document.getElementById("requestee");
-  const deptInput = document.getElementById("department");
-  select.innerHTML = "";
-  employeeData.sort((a, b) => a.name.localeCompare(b.name)).forEach(user => {
-    const option = document.createElement("option");
-    option.value = user.name;
-    option.textContent = user.name;
-    option.dataset.email = user.email;
-    option.dataset.department = user.department;
-    select.appendChild(option);
-  });
-  select.value = currentUser.name;
-  deptInput.value = currentUser.department;
-  select.addEventListener("change", function () {
-    const selected = this.options[this.selectedIndex];
-    if (selected) deptInput.value = selected.dataset.department;
-  });
+/* Hide steppers only for  fields */
+
+input[name^="_"]::-webkit-outer-spin-button,
+
+input[name^="_"]::-webkit-inner-spin-button {
+
+  -webkit-appearance: none;
+
+  margin: 0;
+
 }
 
-// --- Dynamic Form Logic ---
+
+
+input[name^="_"] {
+
+  -moz-appearance: textfield; /* Firefox */
+
+}
+
+
+
+    .remove-btn {
+
+      background-color: white;
+
+      border: 1px solid #ffa07a;
+
+      color: #d35400;
+
+    }
+
+    .add-btn {
+
+      background-color: white;
+
+      border: 1px solid #1976d2;
+
+      color: #1976d2;
+
+    }
+
+    label {
+
+      margin-bottom: 0.2rem;
+
+    }
+
+    .required::after {
+
+      content: "*";
+
+      color: red;
+
+      margin-left: 2px;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div class="container mt-4 mb-4">
+
+  <div style="position: sticky; top: 0; background-color: white; z-index: 1050; padding-top: 1rem; padding-bottom: 0.5rem;">
+
+    <h2 class="text-center mb-4">AEPL Material Requisition Form</h2>
+
+    <div class="g_id_onload"
+
+     data-client_id="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com"
+
+     data-context="signin"
+
+     data-callback="handleCredentialResponse"
+
+     >
+
+</div>
+
+<div class="g_id_signin"
+
+     data-type="standard"
+
+     data-size="large"
+
+     data-theme="outline"
+
+     data-text="sign_in_with"
+
+     data-shape="rectangular"
+
+     data-logo_alignment="left">
+
+</div>
+
+<div class="form-row">
+
+      <div class="form-group col-md-4">
+
+        <label class="required" for="email">Email ID</label>
+
+        <input type="email" class="form-control" id="email" name="email" readonly>
+
+      </div>
+
+      <div class="form-group col-md-4">
+
+        <label class="required" for="requestee">Staff Name</label>
+
+        <select class="form-control" id="requestee" name="requestee"></select>
+
+      </div>
+
+      <div class="form-group col-md-4">
+
+        <label class="required" for="department">Department</label>
+
+        <input type="text" class="form-control" id="department" name="department" readonly tabindex="-1">
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <form id="requisitionForm">
+
+  <div id="itemContainer"></div>
+
+  <button type="submit" class="btn btn-primary btn-block">Submit</button>
+
+</form>
+
+
+
+</div>
+
+
+
+<script>
+
+let itemCount = 0;
+
 function addItemBox() {
-  itemCount++;
-  const container = document.getElementById("itemContainer");
-  const itemBox = document.createElement("div");
-  itemBox.className = "item-box";
-  itemBox.id = `item-box-${itemCount}`;
-  const todayStr = new Date().toISOString().split("T")[0];
-  itemBox.innerHTML = `<h5>Item #${itemCount}</h5><div class="form-row"><div class="form-group col-md-1"><label>UID</label><input type="text" class="form-control" name="uid_${itemCount}" readonly></div><div class="form-group col-md-4"><label class="required">Name / Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div><div class="form-group col-md-1"><label>In Stock</label><input type="text" class="form-control" name="stock_${itemCount}" readonly></div><div class="form-group col-md-2"><label class="required">Quantity Req.</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div><div class="form-group col-md-2"><label class="required">Unit</label><input type="text" class="form-control" name="unit_${itemCount}" required></div><div class="form-group col-md-2 d-flex justify-content-center"><div class="image-preview-container"><img class="image-preview" alt="Image"></div></div></div><div class="form-row"><div class="form-group col-md-1"><label>Type</label><input type="text" class="form-control" name="reqType_${itemCount}" readonly></div><div class="form-group col-md-2"><label>Est. Unit Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any"></div><div class="form-group col-md-1"><label>GST%</label><input type="number" class="form-control" name="gst_${itemCount}" step="1"></div><div class="form-group col-md-2"><label>Est. Total Price</label><input type="text" class="form-control" name="totalPrice_${itemCount}" readonly></div><div class="form-group col-md-2"><label>Est. Total + GST</label><input type="text" class="form-control" name="totalWithGst_${itemCount}" readonly></div><div class="form-group col-md-2"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" required></div><div class="form-group col-md-2"><label>Priority</label><br><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Normal" checked><label class="form-check-label">Normal</label></div></div></div><div class="form-row"><div class="form-group col-md-6"><label class="required">Order For (Project/Client)</label><input type="text" class="form-control" name="orderFor_${itemCount}" required></div><div class="form-group col-md-6"><label>Remarks</label><textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea></div></div><div class="form-row mt-2"><div class="form-group col-md-12 button-row d-flex justify-content-between"></div></div>`;
-  container.appendChild(itemBox);
-  updateItemControls();
-  bindAutocomplete(itemCount);
+
+  itemCount++;
+
+  const container = document.getElementById("itemContainer");
+
+  const itemBox = document.createElement("div");
+
+  itemBox.className = "item-box";
+
+
+
+  const today = new Date();
+
+  const todayStr = today.toISOString().split("T")[0];
+
+  const defaultDate = new Date(today);
+
+  defaultDate.setDate(today.getDate() + 7);
+
+  const defaultDateStr = defaultDate.toISOString().split("T")[0];
+
+
+
+  itemBox.innerHTML = `
+
+    <h5>Item ${itemCount}</h5>
+
+    <input type="hidden" name="email_${itemCount}" value="${document.getElementById('email').value}">
+
+    <input type="hidden" name="requestee_${itemCount}" value="${document.getElementById('requestee').value}">
+
+    <input type="hidden" name="department_${itemCount}" value="${document.getElementById('department').value}">
+
+    <div class="form-row">
+
+      <div class="form-group col-md-5">
+
+        <label class="required">Name / Description</label>
+
+        <input type="text" class="form-control" name="name_${itemCount}" required>
+
+      </div>
+
+      <div class="form-group col-md-2">
+
+        <label class="required">Quantity</label>
+
+        <input type="number" class="form-control" name="quantity_${itemCount}" step="1.00" required>
+
+      </div>
+
+      <div class="form-group col-md-2">
+
+        <label class="required">Unit</label>
+
+        <select class="form-control" name="unit_${itemCount}">
+
+          <option value="pcs">pcs</option>
+
+          <option value="kg">kg</option>
+
+          <option value="gms">gms</option>
+
+          <option value="ft">ft</option>
+
+          <option value="sqft">sqft</option>
+
+          <option value="ltr">ltr</option>
+
+          <option value="inch">inch</option>
+
+          <option value="sq inch">sq inch</option>
+
+          <option value="mm">mm</option>
+
+          <option value="cm">cm</option>
+
+          <option value="mtr">mtr</option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group col-md-2">
+
+        <label>Est. Unit Price</label>
+
+        <input type="number" class="form-control" name="unitPrice_${itemCount}" step="1.00">
+
+      </div>
+
+<div class="form-group col-md-1">
+
+  <label>GST%</label>
+
+  <div class="input-group">
+
+    <input type="number" class="form-control" name="gst_${itemCount}" step="1" min="0" max="100">
+
+  </div>
+
+</div>
+
+
+
+
+
+      </div>
+
+    </div>
+
+    <div class="form-row">
+
+      <div class="form-group col-md-1">
+
+        <label>Type</label>
+
+        <input type="text" class="form-control" name="reqType_${itemCount}" readonly tabindex="-1">
+
+      </div>
+
+      <div class="form-group col-md-4">
+
+        <label>Suggested Vendor <small></small></label>
+
+        <input type="text" class="form-control" name="vendor_${itemCount}">
+
+      </div>
+
+      <div class="form-group col-md-3">
+
+        <label class="required">Target Date</label>
+
+        <input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required>
+
+      </div>
+
+      <div class="form-group col-md-2">
+
+        <label>Est. Total Price</label>
+
+        <input type="number" class="form-control" name="totalPrice_${itemCount}" readonly tabindex="-1">
+
+      </div>
+
+      <div class="form-group col-md-2">
+
+        <label>Est. Total Incl. GST</label>
+
+        <input type="number" class="form-control" name="totalWithGst_${itemCount}" readonly tabindex="-1">
+
+      </div>
+
+    </div>
+
+    <div class="form-row">
+
+      <div class="form-group col-md-7">
+
+        <label class="required">Order For <small></small></label>
+
+        <input type="text" class="form-control" name="orderFor_${itemCount}" required>
+
+      </div>
+
+      <div class="form-group col-md-3">
+
+        <label>Remarks</label>
+
+        <textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea>
+
+      </div>
+
+      <div class="form-group col-md-2">
+
+        <label>Priority</label><br>
+
+        <div class="form-check form-check-inline">
+
+          <input class="form-check-input" type="checkbox" name="priority_${itemCount}" value="Urgent">
+
+          <label class="form-check-label">Urgent</label>
+
+        </div>
+
+        <div class="form-check form-check-inline">
+
+          <input class="form-check-input" type="checkbox" name="priority_${itemCount}" value="Important">
+
+          <label class="form-check-label">Important</label>
+
+        </div>
+
+      </div>
+
+      
+
+      
+
+      
+
+    </div>
+
+    <div class="form-row">
+
+      <div class="form-group col-md-12 button-row"></div>
+
+    </div>`;
+
+
+
+  
+
+  container.appendChild(itemBox);
+
+  updateItemControls();
+
+  bindAutocomplete(itemCount);
+
 }
+
+
 
 function removeItemBox(button) {
-  button.closest(".item-box").remove();
-  document.querySelectorAll(".item-box h5").forEach((h, i) => h.textContent = `Item #${i + 1}`);
-  updateItemControls();
+
+  const box = button.closest(".item-box");
+
+  box.remove();
+
+  itemCount--;
+
+  document.querySelectorAll(".item-box h5").forEach((h, i) => h.textContent = `Item ${i + 1}`);
+
+  updateItemControls();
+
 }
+
+
 
 function updateItemControls() {
-  const boxes = document.querySelectorAll(".item-box");
-  boxes.forEach((box, idx) => {
-    const row = box.querySelector('.button-row');
-    row.innerHTML = '';
-    if (boxes.length > 1) {
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'btn btn-outline-danger';
-      removeBtn.innerText = '− Remove Item';
-      removeBtn.onclick = () => removeItemBox(removeBtn);
-      row.appendChild(removeBtn);
-    }
-    if (idx === boxes.length - 1) {
-      const addBtn = document.createElement('button');
-      addBtn.type = 'button';
-      addBtn.className = 'btn btn-outline-primary ml-auto';
-      addBtn.innerText = '+ Add Another Item';
-      addBtn.onclick = addItemBox;
-      row.appendChild(addBtn);
-    }
-  });
+
+  const boxes = document.querySelectorAll(".item-box");
+
+  boxes.forEach((box, idx) => {
+
+    const row = box.querySelector('.button-row');
+
+    row.innerHTML = '';
+
+    const wrapper = document.createElement('div');
+
+    wrapper.className = 'd-flex w-100';
+
+    if (idx === boxes.length - 1) {
+
+      const addWrapper = document.createElement('div');
+
+      addWrapper.className = 'mr-auto';
+
+      const addBtn = document.createElement('button');
+
+      addBtn.type = 'button';
+
+      addBtn.className = 'btn add-btn';
+
+      addBtn.innerText = '+ Add Item';
+
+      addBtn.onclick = addItemBox;
+
+      addWrapper.appendChild(addBtn);
+
+      wrapper.appendChild(addWrapper);
+
+    }
+
+    if (boxes.length > 1) {
+
+      const removeWrapper = document.createElement('div');
+
+      removeWrapper.className = 'ml-auto';
+
+      const removeBtn = document.createElement('button');
+
+      removeBtn.type = 'button';
+
+      removeBtn.className = 'btn remove-btn';
+
+      removeBtn.innerText = '- Remove Item';
+
+      removeBtn.onclick = function () { removeItemBox(removeBtn); };
+
+      removeWrapper.appendChild(removeBtn);
+
+      wrapper.appendChild(removeWrapper);
+
+    }
+
+    row.appendChild(wrapper);
+
+  });
+
 }
 
-// --- Autocomplete and Calculations ---
-function calculateTotals(index) {
-  const box = $(`#item-box-${index}`);
-  const qty = parseFloat(box.find(`[name='quantity_${index}']`).val()) || 0;
-  const price = parseFloat(box.find(`[name='unitPrice_${index}']`).val()) || 0;
-  const gst = parseFloat(box.find(`[name='gst_${index}']`).val()) || 0;
-  const total = qty * price;
-  const totalWithGst = total * (1 + (gst / 100));
-  box.find(`[name='totalPrice_${index}']`).val(total.toFixed(2));
-  box.find(`[name='totalWithGst_${index}']`).val(totalWithGst.toFixed(2));
+
+
+function setUserDetails(user) {
+
+  const requestee = document.getElementById("requestee");
+
+  requestee.innerHTML = `<option value="${user.name}">${user.name}</option>`;
+
+  document.getElementById("department").value = user.department;
+
 }
+
+
+
+window.addEventListener("DOMContentLoaded", async function () {
+
+  await fetchStaticData();
+
+
+
+  const syncFields = ['email', 'requestee', 'department'];
+
+  syncFields.forEach(id => {
+
+    const field = document.getElementById(id);
+
+    if (field) {
+
+      field.addEventListener('input', () => {
+
+        const itemBoxes = document.querySelectorAll('.item-box');
+
+        itemBoxes.forEach((box, index) => {
+
+          let idx = index + 1;
+
+          const setOrCreateHidden = (name, value) => {
+
+            let input = box.querySelector(`input[name='${name}_${idx}']`);
+
+            if (!input) {
+
+              input = document.createElement("input");
+
+              input.type = "hidden";
+
+              input.name = `${name}_${idx}`;
+
+              box.appendChild(input);
+
+            }
+
+            input.value = value;
+
+          };
+
+          setOrCreateHidden("email", document.getElementById("email").value);
+
+          setOrCreateHidden("requestee", document.getElementById("requestee").value);
+
+          setOrCreateHidden("department", document.getElementById("department").value);
+
+        });
+
+      });
+
+    }
+
+  });
+
+
+
+  
+
+});
+
+
+
+  
+
+
+
+  
+
+</script>
+
+<script>
+
+let iData = [];
+
+let cmsItems = [];
+
+
+
+async function fetchStaticData() {
+
+  try {
+
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec?action=getStaticData");
+
+    const data = await response.json();
+
+    iData = data.iData;
+
+    cmsItems = data.cmsItems;
+
+  } catch (err) {
+
+    console.error("Error loading data:", err);
+
+  }
+
+}
+
+
+
+function calculateTotals(index) {
+
+  const qty = parseFloat(document.querySelector(`[name='quantity_${index}']`)?.value || 0);
+
+  const price = parseFloat(document.querySelector(`[name='unitPrice_${index}']`)?.value || 0);
+
+  const gstRaw = document.querySelector(`[name='gst_${index}']`)?.value || '0';
+
+const gst = parseFloat(gstRaw.toString().replace('%', '')) / 100;
+
+
+
+
+
+  const total = qty * price;
+
+  const totalGst = total * (1 + gst);
+
+
+
+  document.querySelector(`[name='totalPrice_${index}']`).value = total.toFixed(2);
+
+  document.querySelector(`[name='totalWithGst_${index}']`).value = totalGst.toFixed(2);
+
+}
+
+
 
 function bindAutocomplete(index) {
-  const nameInput = $(`#item-box-${index} [name='name_${index}']`);
-  const orderInput = $(`#item-box-${index} [name='orderFor_${index}']`);
-  const box = $(`#item-box-${index}`);
 
-  nameInput.autocomplete({
-    source: (request, response) => {
-      const matches = productData.filter(i => smartMatch(i.Name, request.term));
-      response(matches.map(i => ({ label: i.Name, value: i.Name, item: i })));
-    },
-    select: (event, ui) => {
-      event.preventDefault();
-      const item = ui.item.item;
-      box.find(`[name='uid_${index}']`).val(item.UID);
-      box.find(`[name='name_${index}']`).val(item.Name);
-      box.find(`[name='stock_${index}']`).val(item.Stock);
-      box.find(`[name='unit_${index}']`).val(item.Unit);
-      box.find(`[name='unitPrice_${index}']`).val(item.UnitPrice);
-      box.find(`[name='gst_${index}']`).val(item.GST);
-      box.find(`[name='reqType_${index}']`).val('Repeat').removeClass('req-type-new');
-      const imgPreview = box.find('.image-preview');
-      if (item.ImageLink && item.ImageLink.includes('drive.google.com')) {
-        const idMatch = item.ImageLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        if (idMatch) imgPreview.attr('src', 'https://drive.google.com/thumbnail?id=' + idMatch[1]).addClass('visible');
-      } else {
-        imgPreview.attr('src', '').removeClass('visible');
-      }
-      calculateTotals(index);
-      return false;
-    },
-    change: (event, ui) => {
-      if (!ui.item) {
-        box.find(`[name='reqType_${index}']`).val('New').addClass('req-type-new');
-        box.find(`[name='uid_${index}']`).val('');
-        box.find(`[name='stock_${index}']`).val('');
-        box.find('.image-preview').attr('src', '').removeClass('visible');
-      }
-    }
-  }).autocomplete("instance")._renderItem = function(ul, item) {
-    // This is the updated render function that adds highlighting
-    const highlightedLabel = highlightMatch(item.label, this.term);
-    return $("<li>")
-      .append(`<div>${highlightedLabel}<br><small>UID: ${item.item.UID} | Stock: ${item.item.Stock}</small></div>`)
-      .appendTo(ul);
-  };
+  const nameInput = document.querySelector(`[name='name_${index}']`);
 
-  orderInput.autocomplete({ source: orderForData });
+  const orderInput = document.querySelector(`[name='orderFor_${index}']`);
 
-  box.find(`[name='quantity_${index}']`).on('input', () => calculateTotals(index));
-  box.find(`[name='unitPrice_${index}']`).on('input', () => calculateTotals(index));
-  box.find(`[name='gst_${index}']`).on('input', () => calculateTotals(index));
+
+
+const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+
+
+function smartMatch(text, term) {
+
+  const normText = normalize(text);
+
+  const words = normalize(term).split(/\s+/);
+
+  return words.every(word => normText.includes(word));
+
 }
 
-// --- Form Submission ---
-document.getElementById("requisitionForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-  const submitBtn = this.querySelector("button[type='submit']");
-  let isValid = true;
-  let validationErrors = [];
-  document.querySelectorAll(".item-box").forEach((box, i) => {
-      const index = i + 1;
-      const name = box.querySelector(`[name='name_${index}']`).value.trim();
-      const quantity = parseFloat(box.querySelector(`[name='quantity_${index}']`).value);
-      const unit = box.querySelector(`[name='unit_${index}']`).value.trim();
-      const neededBy = box.querySelector(`[name='neededBy_${index}']`).value;
-      const orderFor = box.querySelector(`[name='orderFor_${index}']`).value.trim();
-      if (!name) { validationErrors.push(`Item #${index}: Name/Description is required.`); isValid = false; }
-      if (isNaN(quantity) || quantity <= 0) { validationErrors.push(`Item #${index}: Quantity must be a number greater than 0.`); isValid = false; }
-      if (!unit) { validationErrors.push(`Item #${index}: Unit is required.`); isValid = false; }
-      if (!neededBy) { validationErrors.push(`Item #${index}: Target Date is required.`); isValid = false; }
-      if (!orderFor) { validationErrors.push(`Item #${index}: 'Order For' is required.`); isValid = false; }
-  });
-  if (!isValid) {
-      alert("Please fix the following errors:\n\n" + validationErrors.join("\n"));
-      return;
-  }
-  submitBtn.disabled = true;
-  submitBtn.innerText = "Submitting...";
-  const formData = new FormData(this);
-  const email = document.getElementById("email").value;
-  const requestee = document.getElementById("requestee").value;
-  const department = document.getElementById("department").value;
-  formData.append('header_email', email);
-  formData.append('header_requestee', requestee);
-  formData.append('header_department', department);
-  fetch(SCRIPT_URL_POST, { method: "POST", body: formData })
-    .then(response => response.text())
-    .then(text => {
-      if (text.trim().toLowerCase() === "success") {
-        alert("Requisition submitted successfully!");
-        window.location.reload();
-      } else {
-        throw new Error(text);
-      }
-    })
-    .catch(error => {
-      console.error("Submission error:", error);
-      alert(`Submission failed. Please check the console for details or try again.\n\nError: ${error.message}`);
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Submit Requisition";
-    });
+
+
+function highlightMatch(text, term) {
+
+  const normText = normalize(text);
+
+  const words = normalize(term).split(/\s+/);
+
+  let result = text;
+
+
+
+  words.forEach(word => {
+
+    const escaped = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+
+    const regex = new RegExp(`(${escaped})`, "ig");
+
+    result = result.replace(regex, "<strong>$1</strong>");
+
+  });
+
+
+
+  return result;
+
+}
+
+
+
+  
+
+  if (nameInput) {
+
+    $(nameInput).autocomplete({
+
+
+
+source: function (request, response) {
+
+  const matches = iData
+
+    .filter(i => smartMatch(i.name, request.term))
+
+    .map(i => ({ label: highlightMatch(i.name, request.term), value: i.name }));
+
+  response(matches);
+
+},
+
+      focus: function (event, ui) {
+
+        event.preventDefault();
+
+        $(nameInput).val(ui.item.value);
+
+      },
+
+      select: function (event, ui) {
+
+        $(nameInput).val(ui.item.value);
+
+        const matched = iData.find(i => i.name === ui.item.value);
+
+        if (matched) {
+
+          document.querySelector(`[name='unit_${index}']`).value = matched.unit;
+
+          document.querySelector(`[name='unitPrice_${index}']`).value = matched.unitPrice;
+
+          const gstInput = document.querySelector(`[name='gst_${index}']`);
+
+          gstInput.value = (parseFloat(matched.gst) * 100).toFixed(0);
+
+
+
+          document.querySelector(`[name='vendor_${index}']`).value = matched.vendor;
+
+          const typeInput = document.querySelector(`[name='reqType_${index}']`);
+
+          typeInput.value = 'Repeat';
+
+typeInput.style.color = '';
+
+typeInput.style.fontWeight = '';
+
+
+
+          calculateTotals(index);
+
+        }
+
+        return false;
+
+      },
+
+      change: function (event, ui) {
+
+  if (!ui.item) {
+
+    const typeInput = document.querySelector(`[name='reqType_${index}']`);
+
+typeInput.value = 'New';
+
+typeInput.style.color = 'red';
+
+typeInput.style.fontWeight = 'bold';
+
+    document.querySelector(`[name='unitPrice_${index}']`).value = '';
+
+    document.querySelector(`[name='gst_${index}']`).value = '';
+
+    document.querySelector(`[name='vendor_${index}']`).value = '';
+
+  }
+
+}
+
+
+
+    }).autocomplete("instance")._renderItem = function (ul, item) {
+
+      return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
+
+    };
+
+  }
+
+
+
+  if (orderInput) {
+
+    $(orderInput).autocomplete({
+
+
+
+source: function (request, response) {
+
+  const matches = cmsItems
+
+    .filter(item => smartMatch(item, request.term))
+
+    .map(item => ({ label: highlightMatch(item, request.term), value: item }));
+
+  response(matches);
+
+},
+
+
+
+      
+
+  
+
+      select: function (event, ui) {
+
+        orderInput.value = ui.item.value;
+
+        return false;
+
+      }
+
+    }).autocomplete("instance")._renderItem = function (ul, item) {
+
+      return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
+
+    };
+
+  }
+
+if (orderInput) {
+
+  orderInput.addEventListener("blur", function () {
+
+    const match = cmsItems.find(item => normalize(item) === normalize(orderInput.value));
+
+    if (!match) {
+
+  orderInput.value = "";
+
+}
+
+
+
+  });
+
+}
+
+
+
+
+
+
+
+  
+
+  const qty = document.querySelector(`[name='quantity_${index}']`);
+
+  const price = document.querySelector(`[name='unitPrice_${index}']`);
+
+  const gst = document.querySelector(`[name='gst_${index}']`);
+
+  if (gst) {
+
+  gst.addEventListener("input", () => {
+
+    gst.value = gst.value.replace(/[^0-9%]/g, '');
+
+  });
+
+}
+
+
+
+const vendorInput = document.querySelector(`[name='vendor_${index}']`);
+
+if (vendorInput) {
+
+  const vendors = [...new Set(iData.map(i => i.vendor).filter(Boolean))];
+
+
+
+  $(vendorInput).autocomplete({
+
+    source: function (request, response) {
+
+      const matches = vendors
+
+        .filter(v => smartMatch(v, request.term))
+
+        .map(v => ({ label: highlightMatch(v, request.term), value: v }));
+
+      response(matches);
+
+    },
+
+    select: function (event, ui) {
+
+      vendorInput.value = ui.item.value;
+
+      return false;
+
+    }
+
+  }).autocomplete("instance")._renderItem = function (ul, item) {
+
+    return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
+
+  };
+
+}
+
+
+
+  if (qty) qty.addEventListener("input", () => calculateTotals(index));
+
+  if (price) price.addEventListener("input", () => calculateTotals(index));
+
+  if (gst) gst.addEventListener("change", () => calculateTotals(index));
+
+}
+
+
+
+
+
+
+
+// Fetch and add on page load
+
+window.addEventListener("DOMContentLoaded", async function () {
+
+  await fetchStaticData();
+
+  addItemBox();
+
 });
+
+
+
+document.getElementById("requisitionForm").addEventListener("keydown", function (e) {
+
+  if (e.key === "Enter") {
+
+    e.preventDefault();
+
+  }
+
+});
+
+
+
+  
+
+document.getElementById("requisitionForm").addEventListener("submit", async function (e) {
+
+  e.preventDefault();
+
+
+
+  const form = e.target;
+
+  form.querySelector("button[type='submit']").disabled = true;
+
+
+
+  const formData = new FormData(form);
+
+  const email = document.getElementById("email").value;
+
+  const requestee = document.getElementById("requestee").value;
+
+  const department = document.getElementById("department").value;
+
+
+
+  document.querySelectorAll(".item-box").forEach((box, i) => {
+
+    const index = i + 1;
+
+    formData.set(`email_${index}`, email);
+
+    formData.set(`requestee_${index}`, requestee);
+
+    formData.set(`department_${index}`, department);
+
+  });
+
+
+
+  try {
+
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec", {
+
+      method: "POST",
+
+      body: formData
+
+    });
+
+    const text = await response.text();
+
+    if (text.trim().toLowerCase() === "success") {
+
+      $('#toastSuccess').toast('show');
+
+      form.reset();
+
+      form.querySelector("button[type='submit']").disabled = false;
+
+      document.getElementById("itemContainer").innerHTML = "";
+
+      itemCount = 0;
+
+      addItemBox();
+
+    } else {
+
+      alert("Error from server: " + text);
+
+    }
+
+  } catch (error) {
+
+    console.error("Submission error:", error);
+
+    alert("Submission failed. Please try again.");
+
+    form.querySelector("button[type='submit']").disabled = false;
+
+
+
+  }
+
+});
+
 </script>
+
+  <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999;">
+
+  <div id="toastSuccess" class="toast" role="alert" data-delay="3000" style="min-width: 250px;">
+
+    <div class="toast-header bg-success text-white">
+
+      <strong class="mr-auto">Success</strong>
+
+      <button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast" aria-label="Close" onclick="$('#toastSuccess').toast('hide')">
+
+        <span aria-hidden="true">&times;</span>
+
+      </button>
+
+    </div>
+
+    <div class="toast-body">Form submitted successfully!</div>
+
+  </div>
+
+</div>
+
+
+
 </body>
+
 </html>
