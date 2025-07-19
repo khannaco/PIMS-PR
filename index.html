@@ -153,25 +153,25 @@ function addItemBox() {
     // This new HTML has the image preview moved to the second row and the first row re-balanced.
 // This final version uses absolute positioning for the image block
 itemBox.innerHTML = `
-<h5>Item #${itemCount}</h5>
-
-<div class="form-row">
-<div class="form-group col-md-2"><label>UID</label><input type="text" class="form-control" name="uid_${itemCount}" readonly></div>
-<div class="form-group col-md-7"><label class="required">Name/Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div>
-<div class="form-group col-md-1"><label>Stock</label><input type="text" class="form-control" name="stock_${itemCount}" readonly></div>
-<div class="form-group col-md-1"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required readonly></select></div>
-<div class="form-group col-md-1"><label class="required">Req. Qty</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div>
-</div>
+<h5>Item - ${itemCount}</h5>
 
 <div class="form-row">
 <div class="form-group col-md-1"><label>Type</label><input type="text" class="form-control" name="reqType_${itemCount}" readonly></div>
-<div class="form-group col-md-3 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:120px; height:90px; display:flex; align-items:center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div>
-<div class="form-group col-md-2"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Important"><label class="form-check-label">Important</label></div></div></div>
+<div class="form-group col-md-1"><label>UID</label><input type="text" class="form-control" name="uid_${itemCount}" readonly></div>
+<div class="form-group col-md-7"><label class="required">Name/Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div>
+<div class="form-group col-md-1"><label class="required">R. Qty</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div>
+<div class="form-group col-md-1"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required readonly></select></div>
+<div class="form-group col-md-1"><label>Stock</label><input type="text" class="form-control" name="stock_${itemCount}" readonly></div>
+</div>
+
+<div class="form-row">
+<div class="form-group col-md-2 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:120px; height:90px; display:flex; align-items:center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div>
+<div class="form-group col-md-1"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Important"><label class="form-check-label">Important</label></div></div></div>
 <div class="form-group col-md-2"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required></div>
-<div class="form-group col-md-1"><label>Est. Total</label><input type="text" class="form-control" name="totalPrice_${itemCount}" readonly></div>
-<div class="form-group col-md-1"><label>Est. Total(G)</label><input type="text" class="form-control" name="totalWithGst_${itemCount}" readonly></div>
-<div class="form-group col-md-1"><label>U. Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any" readonly></div>
+<div class="form-group col-md-1"><label>U.Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any" readonly></div>
+<div class="form-group col-md-1"><label>Total</label><input type="text" class="form-control" name="totalPrice_${itemCount}" readonly></div>
 <div class="form-group col-md-1"><label>GST%</label><select class="form-control" name="gst_${itemCount}" readonly><option value="">N/A</option><option value="3">3%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></div>
+<div class="form-group col-md-1"><label>Total(G)</label><input type="text" class="form-control" name="totalWithGst_${itemCount}" readonly></div>
 </div>
 
 <div class="form-row">
