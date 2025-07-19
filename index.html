@@ -116,7 +116,6 @@
 <script>
 // --- Global Variables ---
 const SCRIPT_URL_GET = "https://script.google.com/macros/s/AKfycbzzA73rqV7QtHo-bbr7pbW3wUAc7XkWoJSEi7XljKGb2cjCZ1MKeYzK5zaxULbB5rD9QQ/exec";
-// IMPORTANT: Replace this with the URL of the script that will RECEIVE the form data
 const SCRIPT_URL_POST = "ADD_YOUR_POST_SCRIPT_URL_HERE"; 
 
 let itemCount = 0;
@@ -357,7 +356,6 @@ function bindAutocomplete(index) {
 
   const normalize = str => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
   
-  // THIS IS THE CORRECTED SMARTMATCH FUNCTION
   const smartMatch = (text, term) => {
       const normText = normalize(text);
       const words = normalize(term).split(/\s+/).filter(w => w.length > 0);
@@ -373,25 +371,27 @@ function bindAutocomplete(index) {
       event.preventDefault();
       const item = ui.item.item;
       
+      // THIS SECTION IS NOW CORRECTED TO USE THE NEW, STANDARDIZED PROPERTY NAMES
       box.find(`[name='uid_${index}']`).val(item.UID);
       box.find(`[name='name_${index}']`).val(item.Name);
       box.find(`[name='stock_${index}']`).val(item.Stock);
-      box.find(`[name='unit_${index}']`).val(item['Unit']);
-      box.find(`[name='unitPrice_${index}']`).val(item['Unit Price']);
-      box.find(`[name='gst_${index}']`).val(item['GST']);
-      box.find(`[name='vendor_${index}']`).val(item['Vendor']);
+      box.find(`[name='unit_${index}']`).val(item.Unit);
+      box.find(`[name='unitPrice_${index}']`).val(item.UnitPrice);
+      box.find(`[name='gst_${index}']`).val(item.GST);
+      // Vendor is intentionally left out to allow manual entry if needed, but you can add it back:
+      // box.find(`[name='vendor_${index}']`).val(item.Vendor);
       box.find(`[name='reqType_${index}']`).val('Repeat').removeClass('req-type-new');
 
       const imgPreview = box.find('.image-preview');
-      if (item['Image Link'] && item['Image Link'].includes('drive.google.com')) {
-        const idMatch = item['Image Link'].match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (item.ImageLink && item.ImageLink.includes('drive.google.com')) {
+        const idMatch = item.ImageLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (idMatch) {
             imgPreview.attr('src', 'https://drive.google.com/thumbnail?id=' + idMatch[1]).addClass('visible');
         }
       } else {
         imgPreview.attr('src', '').removeClass('visible');
       }
-      calculateTotals(index); // Calculate totals on select
+      calculateTotals(index);
       return false;
     },
     change: (event, ui) => {
@@ -412,14 +412,12 @@ function bindAutocomplete(index) {
     source: orderForData
   });
 
-  // BIND EVENT LISTENERS FOR TOTALS CALCULATION
   box.find(`[name='quantity_${index}']`).on('input', () => calculateTotals(index));
   box.find(`[name='unitPrice_${index}']`).on('input', () => calculateTotals(index));
   box.find(`[name='gst_${index}']`).on('input', () => calculateTotals(index));
 }
 
 // --- Form Submission ---
-// (No changes here, remains the same)
 document.getElementById("requisitionForm").addEventListener("submit", function(e) {
   e.preventDefault();
   const submitBtn = this.querySelector("button[type='submit']");
