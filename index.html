@@ -21,6 +21,7 @@
         label { font-weight: 500; color: #495057; }
         .required::after { content: " *"; color: #dc3545; }
         .ui-autocomplete .ui-menu-item strong { color: #007bff; }
+        input[readonly], select[readonly] { background-color: #e9ecef !important; }
     </style>
 </head>
 <body>
@@ -44,8 +45,7 @@
         <hr/>
         
         <form id="requisitionForm">
-            <div id="itemContainer">
-                </div>
+            <div id="itemContainer"></div>
             <button type="submit" class="btn btn-primary btn-lg btn-block mt-3" style="display:none;">Submit Requisition</button>
         </form>
     </div>
@@ -61,7 +61,7 @@ let productData = [], employeeData = [], orderForData = [];
 
 // --- CORE LOGIC ---
 window.addEventListener("DOMContentLoaded", () => {
-    fetchInitialData(); // Start fetching data immediately in the background
+    fetchInitialData();
 });
 
 window.onload = () => {
@@ -79,11 +79,9 @@ async function fetchInitialData() {
         if (!response.ok) throw new Error(`Network response was not ok (${response.status})`);
         const data = await response.json();
         if (data.error) throw new Error(data.error);
-
         productData = data.productData;
         employeeData = data.employeeData;
         orderForData = data.orderForData;
-
     } catch (err) {
         console.error("Fatal Error fetching initial data:", err);
         spinner.innerHTML = `<strong style="color:red;">Error: Could not load data. Please reload.</strong><br><small>${err.message}</small>`;
@@ -96,18 +94,14 @@ function handleCredentialResponse(response) {
     const currentUser = employeeData.find(u => u.email === decoded.email);
 
     if (currentUser) {
-        // SUCCESS: User is authorized
         document.getElementById('email').value = decoded.email;
         document.querySelector('.g_id_signin').style.display = 'none';
         document.getElementById('userInfo').style.display = 'flex';
-        
         populateStaffDropdown(currentUser);
-        addItemBox(); // Add the first item box now
+        addItemBox();
         document.querySelector('button[type="submit"]').style.display = 'block';
         spinner.style.display = 'none';
-
     } else {
-        // FAILURE: User is not in the employee list
         alert("Unauthorized Access. Your email is not registered.");
         spinner.style.display = 'none';
     }
@@ -138,8 +132,13 @@ function addItemBox() {
     const itemBox = document.createElement("div");
     itemBox.className = "item-box";
     itemBox.id = `item-box-${itemCount}`;
-    const todayStr = new Date().toISOString().split("T")[0];
-    itemBox.innerHTML = `<h5>Item #${itemCount}</h5><div class="form-row"><div class="form-group col-md-1"><label>UID</label><input type="text" class="form-control-plaintext" name="uid_${itemCount}" readonly></div><div class="form-group col-md-4"><label class="required">Name / Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div><div class="form-group col-md-1"><label>In Stock</label><input type="text" class="form-control-plaintext" name="stock_${itemCount}" readonly></div><div class="form-group col-md-2"><label class="required">Quantity Req.</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div><div class="form-group col-md-2"><label class="required">Unit</label><input type="text" class="form-control" name="unit_${itemCount}" required></div><div class="form-group col-md-2 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:100px; height:80px; display:flex; align-items:center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div></div><div class="form-row"><div class="form-group col-md-1"><label>Type</label><input type="text" class="form-control-plaintext" name="reqType_${itemCount}" readonly></div><div class="form-group col-md-2"><label>Est. Unit Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any"></div><div class="form-group col-md-1"><label>GST%</label><input type="number" class="form-control" name="gst_${itemCount}" step="1"></div><div class="form-group col-md-2"><label>Est. Total Price</label><input type="text" class="form-control-plaintext" name="totalPrice_${itemCount}" readonly></div><div class="form-group col-md-2"><label>Est. Total + GST</label><input type="text" class="form-control-plaintext" name="totalWithGst_${itemCount}" readonly></div><div class="form-group col-md-2"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" required></div><div class="form-group col-md-2"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Normal" checked><label class="form-check-label">Normal</label></div></div></div></div><div class="form-row"><div class="form-group col-md-6"><label class="required">Order For (Project/Client)</label><input type="text" class="form-control" name="orderFor_${itemCount}" required></div><div class="form-group col-md-6"><label>Remarks</label><textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea></div></div><div class="button-row d-flex justify-content-between"></div>`;
+    const today = new Date();
+    const defaultDate = new Date(today);
+    defaultDate.setDate(today.getDate() + 7);
+    const todayStr = today.toISOString().split("T")[0];
+    const defaultDateStr = defaultDate.toISOString().split("T")[0]; // FIX: Correctly defined here
+
+    itemBox.innerHTML = `<h5>Item #${itemCount}</h5><div class="form-row"><div class="form-group col-md-1"><label>UID</label><input type="text" class="form-control" name="uid_${itemCount}" readonly></div><div class="form-group col-md-4"><label class="required">Name / Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div><div class="form-group col-md-1"><label>In Stock</label><input type="text" class="form-control" name="stock_${itemCount}" readonly></div><div class="form-group col-md-2"><label class="required">Quantity Req.</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div><div class="form-group col-md-2"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required><option value="pcs" selected>pcs</option><option value="kg">kg</option><option value="gms">gms</option><option value="ft">ft</option><option value="sqft">sqft</option><option value="ltr">ltr</option><option value="inch">inch</option><option value="sq inch">sq inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="mtr">mtr</option></select></div><div class="form-group col-md-2 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:100px; height:80px; display:flex; align-items:center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div></div><div class="form-row"><div class="form-group col-md-1"><label>Type</label><input type="text" class="form-control" name="reqType_${itemCount}" readonly></div><div class="form-group col-md-2"><label>Est. Unit Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any"></div><div class="form-group col-md-1"><label>GST%</label><input type="number" class="form-control" name="gst_${itemCount}" step="1"></div><div class="form-group col-md-2"><label>Est. Total Price</label><input type="text" class="form-control" name="totalPrice_${itemCount}" readonly></div><div class="form-group col-md-2"><label>Est. Total + GST</label><input type="text" class="form-control" name="totalWithGst_${itemCount}" readonly></div><div class="form-group col-md-2"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required></div><div class="form-group col-md-2"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Normal" checked><label class="form-check-label">Normal</label></div></div></div></div><div class="form-row"><div class="form-group col-md-6"><label class="required">Order For (Project/Client)</label><input type="text" class="form-control" name="orderFor_${itemCount}" required></div><div class="form-group col-md-6"><label>Remarks</label><textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea></div></div><div class="button-row d-flex justify-content-between"></div>`;
     container.appendChild(itemBox);
     updateItemControls();
     bindAutocomplete(itemCount);
@@ -172,18 +171,15 @@ function bindAutocomplete(index) {
             event.preventDefault();
             const item = ui.item.item;
             const box = document.getElementById(`item-box-${index}`);
-            
             box.querySelector(`[name='uid_${index}']`).value = item.UID;
             box.querySelector(`[name='name_${index}']`).value = item.Name;
             box.querySelector(`[name='stock_${index}']`).value = item.Stock;
             box.querySelector(`[name='unit_${index}']`).value = item.Unit;
             box.querySelector(`[name='unitPrice_${index}']`).value = item.UnitPrice;
             box.querySelector(`[name='gst_${index}']`).value = item.GST;
-            
             const reqTypeInput = box.querySelector(`[name='reqType_${index}']`);
             reqTypeInput.value = 'Repeat';
             reqTypeInput.classList.remove('req-type-new');
-            
             const img = box.querySelector(`[name='image_${index}']`);
             if (item.ImageLink && item.ImageLink.includes('drive.google.com')) {
                 const idMatch = item.ImageLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -191,9 +187,7 @@ function bindAutocomplete(index) {
                     img.src = 'https://drive.google.com/thumbnail?id=' + idMatch[1];
                     img.style.display = 'block';
                 }
-            } else {
-                img.style.display = 'none';
-            }
+            } else { img.style.display = 'none'; }
             calculateTotals(index);
             return false;
         },
@@ -210,7 +204,12 @@ function bindAutocomplete(index) {
     };
 
     const orderInput = $(`#item-box-${index} [name='orderFor_${index}']`);
-    orderInput.autocomplete({ source: orderForData });
+    orderInput.autocomplete({
+        source: (request, response) => {
+            const matches = orderForData.filter(item => smartMatch(item, request.term));
+            response(matches);
+        }
+    });
     
     document.querySelector(`#item-box-${index} [name='quantity_${index}']`).addEventListener('input', () => calculateTotals(index));
     document.querySelector(`#item-box-${index} [name='unitPrice_${index}']`).addEventListener('input', () => calculateTotals(index));
