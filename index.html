@@ -57,7 +57,7 @@ const SCRIPT_URL_POST_FORM = "ADD_YOUR_POST_SCRIPT_URL_HERE";
 
 // --- GLOBAL VARIABLES ---
 let itemCount = 0;
-let productData = [], employeeData = [], orderForData = [];
+let productData = [], employeeData = [], orderForData = [], unitData = [];
 
 // --- CORE LOGIC ---
 window.addEventListener("DOMContentLoaded", () => {
@@ -82,6 +82,7 @@ async function fetchInitialData() {
         productData = data.productData;
         employeeData = data.employeeData;
         orderForData = data.orderForData;
+        unitData = data.unitData;
     } catch (err) {
         console.error("Fatal Error fetching initial data:", err);
         spinner.innerHTML = `<strong style="color:red;">Error: Could not load data. Please reload.</strong><br><small>${err.message}</small>`;
@@ -148,7 +149,7 @@ function addItemBox() {
             <div class="form-group col-md-4"><label class="required">Name / Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div>
             <div class="form-group col-md-1"><label>In Stock</label><input type="text" class="form-control" name="stock_${itemCount}" readonly></div>
             <div class="form-group col-md-2"><label class="required">Quantity Req.</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div>
-            <div class="form-group col-md-2"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required readonly><option value="pcs">pcs</option><option value="kg">kg</option><option value="gms">gms</option><option value="ft">ft</option><option value="sqft">sqft</option><option value="ltr">ltr</option><option value="inch">inch</option><option value="sq inch">sq inch</option><option value="mm">mm</option><option value="cm">cm</option><option value="mtr">mtr</option></select></div>
+            <div class="form-group col-md-2"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required readonly></select></div>
             <div class="form-group col-md-2 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:100px; height:80px; display:flex; align-items:center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div>
         </div>
         <div class="form-row">
@@ -167,6 +168,20 @@ function addItemBox() {
         <div class="button-row d-flex justify-content-between"></div>
     `;
     container.appendChild(itemBox);
+    // --- START: New code to populate Unit dropdown ---
+const unitSelect = itemBox.querySelector(`[name='unit_${itemCount}']`);
+if (unitData && unitData.length > 0) {
+    unitData.forEach(unit => {
+        const option = document.createElement('option');
+        option.value = unit;
+        option.textContent = unit;
+        if (unit.toLowerCase() === 'pcs') {
+            option.selected = true; // Set 'pcs' as the default for new items
+        }
+        unitSelect.appendChild(option);
+    });
+}
+// --- END: New code ---
     updateItemControls();
     bindAutocomplete(itemCount);
 }
