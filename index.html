@@ -138,7 +138,6 @@ function handleCredentialResponse(response) {
   const decoded = parseJwt(response.credential);
   document.getElementById("email").value = decoded.email;
   
-  // Hide sign-in button and show user info section
   document.querySelector(".g_id_signin").style.display = "none";
   document.getElementById("userInfo").style.display = "block";
   
@@ -156,7 +155,6 @@ async function fetchInitialData(email) {
     employeeData = data.employeeData;
     orderForData = data.orderForData;
 
-    // Check if the signed-in user is in the employee list
     const currentUser = employeeData.find(u => u.email === email);
     if (!currentUser) {
         alert("Unauthorized access. Your email is not registered in the employee directory.");
@@ -261,11 +259,15 @@ function addItemBox() {
             <label>GST%</label>
             <input type="number" class="form-control" name="gst_${itemCount}" step="1">
         </div>
-        <div class="form-group col-md-3">
-            <label>Suggested Vendor</label>
-            <input type="text" class="form-control" name="vendor_${itemCount}">
+        <div class="form-group col-md-2">
+            <label>Est. Total Price</label>
+            <input type="text" class="form-control" name="totalPrice_${itemCount}" readonly>
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-2">
+            <label>Est. Total + GST</label>
+            <input type="text" class="form-control" name="totalWithGst_${itemCount}" readonly>
+        </div>
+        <div class="form-group col-md-2">
             <label class="required">Target Date</label>
             <input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" required>
         </div>
@@ -311,9 +313,8 @@ function updateItemControls() {
   const boxes = document.querySelectorAll(".item-box");
   boxes.forEach((box, idx) => {
     const row = box.querySelector('.button-row');
-    row.innerHTML = ''; // Clear previous buttons
+    row.innerHTML = '';
     
-    // Add 'Remove' button if more than one item exists
     if (boxes.length > 1) {
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
@@ -323,7 +324,6 @@ function updateItemControls() {
       row.appendChild(removeBtn);
     }
     
-    // Add 'Add' button only to the last item
     if (idx === boxes.length - 1) {
       const addBtn = document.createElement('button');
       addBtn.type = 'button';
@@ -337,14 +337,33 @@ function updateItemControls() {
 
 // --- Autocomplete and Calculations ---
 
+function calculateTotals(index) {
+  const box = $(`#item-box-${index}`);
+  const qty = parseFloat(box.find(`[name='quantity_${index}']`).val()) || 0;
+  const price = parseFloat(box.find(`[name='unitPrice_${index}']`).val()) || 0;
+  const gst = parseFloat(box.find(`[name='gst_${index}']`).val()) || 0;
+  
+  const total = qty * price;
+  const totalWithGst = total * (1 + (gst / 100));
+  
+  box.find(`[name='totalPrice_${index}']`).val(total.toFixed(2));
+  box.find(`[name='totalWithGst_${index}']`).val(totalWithGst.toFixed(2));
+}
+
 function bindAutocomplete(index) {
   const nameInput = $(`#item-box-${index} [name='name_${index}']`);
   const orderInput = $(`#item-box-${index} [name='orderFor_${index}']`);
+  const box = $(`#item-box-${index}`);
 
   const normalize = str => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
-  const smartMatch = (text, term) => normalize(text).includes(normalize(term));
+  
+  // THIS IS THE CORRECTED SMARTMATCH FUNCTION
+  const smartMatch = (text, term) => {
+      const normText = normalize(text);
+      const words = normalize(term).split(/\s+/).filter(w => w.length > 0);
+      return words.every(word => normText.includes(word));
+  };
 
-  // Autocomplete for Item Name/Description
   nameInput.autocomplete({
     source: (request, response) => {
       const matches = productData.filter(i => smartMatch(i.Name, request.term));
@@ -353,7 +372,6 @@ function bindAutocomplete(index) {
     select: (event, ui) => {
       event.preventDefault();
       const item = ui.item.item;
-      const box = $(`#item-box-${index}`);
       
       box.find(`[name='uid_${index}']`).val(item.UID);
       box.find(`[name='name_${index}']`).val(item.Name);
@@ -364,7 +382,6 @@ function bindAutocomplete(index) {
       box.find(`[name='vendor_${index}']`).val(item['Vendor']);
       box.find(`[name='reqType_${index}']`).val('Repeat').removeClass('req-type-new');
 
-      // Handle image preview
       const imgPreview = box.find('.image-preview');
       if (item['Image Link'] && item['Image Link'].includes('drive.google.com')) {
         const idMatch = item['Image Link'].match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -374,12 +391,11 @@ function bindAutocomplete(index) {
       } else {
         imgPreview.attr('src', '').removeClass('visible');
       }
+      calculateTotals(index); // Calculate totals on select
       return false;
     },
     change: (event, ui) => {
       if (!ui.item) {
-        // User typed a new item
-        const box = $(`#item-box-${index}`);
         box.find(`[name='reqType_${index}']`).val('New').addClass('req-type-new');
         box.find(`[name='uid_${index}']`).val('');
         box.find(`[name='stock_${index}']`).val('');
@@ -392,19 +408,22 @@ function bindAutocomplete(index) {
         .appendTo(ul);
   };
 
-  // Autocomplete for "Order For"
   orderInput.autocomplete({
     source: orderForData
   });
+
+  // BIND EVENT LISTENERS FOR TOTALS CALCULATION
+  box.find(`[name='quantity_${index}']`).on('input', () => calculateTotals(index));
+  box.find(`[name='unitPrice_${index}']`).on('input', () => calculateTotals(index));
+  box.find(`[name='gst_${index}']`).on('input', () => calculateTotals(index));
 }
 
 // --- Form Submission ---
-
+// (No changes here, remains the same)
 document.getElementById("requisitionForm").addEventListener("submit", function(e) {
   e.preventDefault();
   const submitBtn = this.querySelector("button[type='submit']");
 
-  // --- Validation ---
   let isValid = true;
   let validationErrors = [];
   document.querySelectorAll(".item-box").forEach((box, i) => {
@@ -427,7 +446,6 @@ document.getElementById("requisitionForm").addEventListener("submit", function(e
       return;
   }
   
-  // --- Submission ---
   submitBtn.disabled = true;
   submitBtn.innerText = "Submitting...";
   
@@ -436,7 +454,6 @@ document.getElementById("requisitionForm").addEventListener("submit", function(e
   const requestee = document.getElementById("requestee").value;
   const department = document.getElementById("department").value;
 
-  // Append header data to the form data
   formData.append('header_email', email);
   formData.append('header_requestee', requestee);
   formData.append('header_department', department);
@@ -446,7 +463,7 @@ document.getElementById("requisitionForm").addEventListener("submit", function(e
     .then(text => {
       if (text.trim().toLowerCase() === "success") {
         alert("Requisition submitted successfully!");
-        window.location.reload(); // Reload the page for a fresh form
+        window.location.reload();
       } else {
         throw new Error(text);
       }
@@ -458,7 +475,6 @@ document.getElementById("requisitionForm").addEventListener("submit", function(e
       submitBtn.innerText = "Submit Requisition";
     });
 });
-
 </script>
 </body>
 </html>
