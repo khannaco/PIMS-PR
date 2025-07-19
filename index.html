@@ -52,27 +52,6 @@
 
   <script>
 
-async function fetchEmployeeData(email) {
-
-  try {
-
-    const url = `https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec?email=${encodeURIComponent(email)}`;
-
-    const res = await fetch(url);
-
-    const data = await res.json();
-
-    return data;
-
-  } catch (error) {
-
-    console.error("Fetch error:", error);
-
-    return { error: "Network issue" };
-
-  }
-
-}
 
 
 
@@ -191,12 +170,11 @@ function handleCredentialResponse(response) {
         document.getElementById("requisitionForm").style.display = "none";
 
       } else {
-
-        populateStaffDropdown(data.allUsers, decoded.email);
-
-        document.getElementById("requisitionForm").style.display = "block";
-
-      }
+  // This populates the user's name and department
+  populateStaffDropdown(data.allUsers, decoded.email);
+  // This now adds the first item box AFTER a successful login
+  addItemBox(); 
+}
 
     });
 
@@ -324,6 +302,10 @@ input[name^="_"] {
 
 <body>
 
+<div id="loadingSpinner" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <strong style="font-size:1.2em;">Loading Data, Please Wait...</strong>
+</div>
+  
 <div class="container mt-4 mb-4">
 
   <div style="position: sticky; top: 0; background-color: white; z-index: 1050; padding-top: 1rem; padding-bottom: 0.5rem;">
@@ -433,190 +415,85 @@ function addItemBox() {
 
 
   itemBox.innerHTML = `
-
-    <h5>Item ${itemCount}</h5>
-
-    <input type="hidden" name="email_${itemCount}" value="${document.getElementById('email').value}">
-
-    <input type="hidden" name="requestee_${itemCount}" value="${document.getElementById('requestee').value}">
-
-    <input type="hidden" name="department_${itemCount}" value="${document.getElementById('department').value}">
-
-    <div class="form-row">
-
-      <div class="form-group col-md-5">
-
-        <label class="required">Name / Description</label>
-
-        <input type="text" class="form-control" name="name_${itemCount}" required>
-
-      </div>
-
-      <div class="form-group col-md-2">
-
-        <label class="required">Quantity</label>
-
-        <input type="number" class="form-control" name="quantity_${itemCount}" step="1.00" required>
-
-      </div>
-
-      <div class="form-group col-md-2">
-
-        <label class="required">Unit</label>
-
-        <select class="form-control" name="unit_${itemCount}">
-
-          <option value="pcs">pcs</option>
-
-          <option value="kg">kg</option>
-
-          <option value="gms">gms</option>
-
-          <option value="ft">ft</option>
-
-          <option value="sqft">sqft</option>
-
-          <option value="ltr">ltr</option>
-
-          <option value="inch">inch</option>
-
-          <option value="sq inch">sq inch</option>
-
-          <option value="mm">mm</option>
-
-          <option value="cm">cm</option>
-
-          <option value="mtr">mtr</option>
-
-        </select>
-
-      </div>
-
-      <div class="form-group col-md-2">
-
-        <label>Est. Unit Price</label>
-
-        <input type="number" class="form-control" name="unitPrice_${itemCount}" step="1.00">
-
-      </div>
-
-<div class="form-group col-md-1">
-
-  <label>GST%</label>
-
-  <div class="input-group">
-
-    <input type="number" class="form-control" name="gst_${itemCount}" step="1" min="0" max="100">
-
-  </div>
-
+<h5>Item ${itemCount}</h5>
+<div class="form-row">
+  <div class="form-group col-md-1">
+      <label>UID</label>
+      <input type="text" class="form-control" name="uid_${itemCount}" readonly>
+  </div>
+  <div class="form-group col-md-4">
+    <label class="required">Name / Description</label>
+    <input type="text" class="form-control" name="name_${itemCount}" required>
+  </div>
+  <div class="form-group col-md-1">
+      <label>In Stock</label>
+      <input type="text" class="form-control" name="stock_${itemCount}" readonly>
+  </div>
+  <div class="form-group col-md-2">
+    <label class="required">Quantity Req.</label>
+    <input type="number" class="form-control" name="quantity_${itemCount}" step="any" required>
+  </div>
+  <div class="form-group col-md-2">
+    <label class="required">Unit</label>
+    <input type="text" class="form-control" name="unit_${itemCount}" required>
+  </div>
+  <div class="form-group col-md-2 d-flex justify-content-center">
+      <div class="image-preview-container" style="width:100px; height:80px; border:1px solid #ddd; border-radius:4px; display:flex; align-items:center; justify-content:center; background-color:#f8f9fa;">
+          <img class="image-preview" name="image_${itemCount}" alt="Image" style="max-width:100%; max-height:100%; display:none;">
+      </div>
+  </div>
 </div>
-
-
-
-
-
-      </div>
-
-    </div>
-
-    <div class="form-row">
-
-      <div class="form-group col-md-1">
-
-        <label>Type</label>
-
-        <input type="text" class="form-control" name="reqType_${itemCount}" readonly tabindex="-1">
-
-      </div>
-
-      <div class="form-group col-md-4">
-
-        <label>Suggested Vendor <small></small></label>
-
-        <input type="text" class="form-control" name="vendor_${itemCount}">
-
-      </div>
-
-      <div class="form-group col-md-3">
-
-        <label class="required">Target Date</label>
-
-        <input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required>
-
-      </div>
-
-      <div class="form-group col-md-2">
-
-        <label>Est. Total Price</label>
-
-        <input type="number" class="form-control" name="totalPrice_${itemCount}" readonly tabindex="-1">
-
-      </div>
-
-      <div class="form-group col-md-2">
-
-        <label>Est. Total Incl. GST</label>
-
-        <input type="number" class="form-control" name="totalWithGst_${itemCount}" readonly tabindex="-1">
-
-      </div>
-
-    </div>
-
-    <div class="form-row">
-
-      <div class="form-group col-md-7">
-
-        <label class="required">Order For <small></small></label>
-
-        <input type="text" class="form-control" name="orderFor_${itemCount}" required>
-
-      </div>
-
-      <div class="form-group col-md-3">
-
-        <label>Remarks</label>
-
-        <textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea>
-
-      </div>
-
-      <div class="form-group col-md-2">
-
-        <label>Priority</label><br>
-
-        <div class="form-check form-check-inline">
-
-          <input class="form-check-input" type="checkbox" name="priority_${itemCount}" value="Urgent">
-
-          <label class="form-check-label">Urgent</label>
-
-        </div>
-
-        <div class="form-check form-check-inline">
-
-          <input class="form-check-input" type="checkbox" name="priority_${itemCount}" value="Important">
-
-          <label class="form-check-label">Important</label>
-
-        </div>
-
-      </div>
-
-      
-
-      
-
-      
-
-    </div>
-
-    <div class="form-row">
-
-      <div class="form-group col-md-12 button-row"></div>
-
-    </div>`;
+<div class="form-row">
+    <div class="form-group col-md-1">
+        <label>Type</label>
+        <input type="text" class="form-control" name="reqType_${itemCount}" readonly>
+    </div>
+    <div class="form-group col-md-2">
+        <label>Est. Unit Price</label>
+        <input type="number" class="form-control" name="unitPrice_${itemCount}" step="any">
+    </div>
+    <div class="form-group col-md-1">
+        <label>GST%</label>
+        <input type="number" class="form-control" name="gst_${itemCount}" step="1">
+    </div>
+    <div class="form-group col-md-2">
+        <label>Est. Total Price</label>
+        <input type="text" class="form-control" name="totalPrice_${itemCount}" readonly>
+    </div>
+    <div class="form-group col-md-2">
+        <label>Est. Total + GST</label>
+        <input type="text" class="form-control" name="totalWithGst_${itemCount}" readonly>
+    </div>
+    <div class="form-group col-md-2">
+        <label class="required">Target Date</label>
+        <input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required>
+    </div>
+    <div class="form-group col-md-2">
+        <label>Priority</label><br>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent">
+            <label class="form-check-label">Urgent</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="priority_${itemCount}" value="Normal" checked>
+            <label class="form-check-label">Normal</label>
+        </div>
+    </div>
+</div>
+<div class="form-row">
+  <div class="form-group col-md-6">
+    <label class="required">Order For (Project/Client)</label>
+    <input type="text" class="form-control" name="orderFor_${itemCount}" required>
+  </div>
+  <div class="form-group col-md-6">
+    <label>Remarks</label>
+    <textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea>
+  </div>
+</div>
+<div class="form-row mt-2">
+  <div class="form-group col-md-12 button-row"></div>
+</div>
+`;
 
 
 
@@ -726,68 +603,9 @@ function setUserDetails(user) {
 
 
 
-window.addEventListener("DOMContentLoaded", async function () {
-
-  await fetchStaticData();
-
-
-
-  const syncFields = ['email', 'requestee', 'department'];
-
-  syncFields.forEach(id => {
-
-    const field = document.getElementById(id);
-
-    if (field) {
-
-      field.addEventListener('input', () => {
-
-        const itemBoxes = document.querySelectorAll('.item-box');
-
-        itemBoxes.forEach((box, index) => {
-
-          let idx = index + 1;
-
-          const setOrCreateHidden = (name, value) => {
-
-            let input = box.querySelector(`input[name='${name}_${idx}']`);
-
-            if (!input) {
-
-              input = document.createElement("input");
-
-              input.type = "hidden";
-
-              input.name = `${name}_${idx}`;
-
-              box.appendChild(input);
-
-            }
-
-            input.value = value;
-
-          };
-
-          setOrCreateHidden("email", document.getElementById("email").value);
-
-          setOrCreateHidden("requestee", document.getElementById("requestee").value);
-
-          setOrCreateHidden("department", document.getElementById("department").value);
-
-        });
-
-      });
-
-    }
-
-  });
-
-
-
-  
-
+window.addEventListener("DOMContentLoaded", function () {
+  fetchInitialData(); // Start fetching data in the background
 });
-
 
 
   
@@ -800,30 +618,33 @@ window.addEventListener("DOMContentLoaded", async function () {
 
 <script>
 
-let iData = [];
-
-let cmsItems = [];
+let productData = [], employeeData = [], orderForData = [];
 
 
+// This new function fetches everything in one go from your new script
+async function fetchInitialData() {
+  // Show a loading indicator (we will add the HTML for this later)
+  const spinner = document.getElementById('loadingSpinner');
+  if(spinner) spinner.style.display = 'flex';
 
-async function fetchStaticData() {
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbzzA73rqV7QtHo-bbr7pbW3wUAc7XkWoJSEi7XljKGb2cjCZ1MKeYzK5zaxULbB5rD9QQ/exec");
+    const data = await response.json();
 
-  try {
+    if (data.error) throw new Error(data.error);
 
-    const response = await fetch("https://script.google.com/macros/s/AKfycbyPAemr4EYbQiDH3P58GMVDnXWBbq-844g0lXXTeTfy_4_oPHZmGwKfOjfJBf6W97pt/exec?action=getStaticData");
+    // Populate our new global variables
+    productData = data.productData;
+    employeeData = data.employeeData;
+    orderForData = data.orderForData;
 
-    const data = await response.json();
-
-    iData = data.iData;
-
-    cmsItems = data.cmsItems;
-
-  } catch (err) {
-
-    console.error("Error loading data:", err);
-
-  }
-
+  } catch (err) {
+    console.error("Error loading initial data:", err);
+    alert("Fatal Error: Could not load required data. Please reload the page. Error: " + err.message);
+  } finally {
+    // Hide the loading indicator
+    if(spinner) spinner.style.display = 'none';
+  }
 }
 
 
@@ -918,7 +739,7 @@ function highlightMatch(text, term) {
 
 source: function (request, response) {
 
-  const matches = iData
+  const matches = productData
 
     .filter(i => smartMatch(i.name, request.term))
 
@@ -936,43 +757,38 @@ source: function (request, response) {
 
       },
 
-      select: function (event, ui) {
+     select: function (event, ui) {
+  event.preventDefault(); // prevent value from being inserted
+  const item = ui.item.item; // The full data object from the sheet
 
-        $(nameInput).val(ui.item.value);
+  // Target the fields within the correct item box
+  const box = document.getElementById(`item-box-${index}`);
+  box.querySelector(`[name='uid_${index}']`).value = item.UID;
+  box.querySelector(`[name='name_${index}']`).value = item.Name;
+  box.querySelector(`[name='stock_${index}']`).value = item.Stock;
+  box.querySelector(`[name='unit_${index}']`).value = item.Unit;
+  box.querySelector(`[name='unitPrice_${index}']`).value = item.UnitPrice;
+  box.querySelector(`[name='gst_${index}']`).value = item.GST;
+  box.querySelector(`[name='vendor_${index}']`).value = item.Vendor;
+  box.querySelector(`[name='reqType_${index}']`).value = 'Repeat';
+  box.querySelector(`[name='reqType_${index}']`).classList.remove('req-type-new');
 
-        const matched = iData.find(i => i.name === ui.item.value);
+  // Handle image preview
+  const imgPreview = box.querySelector(`[name='image_${index}']`);
+  if (item.ImageLink && item.ImageLink.includes('drive.google.com')) {
+      const idMatch = item.ImageLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (idMatch) {
+          imgPreview.src = 'https://drive.google.com/thumbnail?id=' + idMatch[1];
+          imgPreview.style.display = 'block';
+      }
+  } else {
+      imgPreview.src = '';
+      imgPreview.style.display = 'none';
+  }
 
-        if (matched) {
-
-          document.querySelector(`[name='unit_${index}']`).value = matched.unit;
-
-          document.querySelector(`[name='unitPrice_${index}']`).value = matched.unitPrice;
-
-          const gstInput = document.querySelector(`[name='gst_${index}']`);
-
-          gstInput.value = (parseFloat(matched.gst) * 100).toFixed(0);
-
-
-
-          document.querySelector(`[name='vendor_${index}']`).value = matched.vendor;
-
-          const typeInput = document.querySelector(`[name='reqType_${index}']`);
-
-          typeInput.value = 'Repeat';
-
-typeInput.style.color = '';
-
-typeInput.style.fontWeight = '';
-
-
-
-          calculateTotals(index);
-
-        }
-
-        return false;
-
-      },
+  calculateTotals(index);
+  return false;
+},
 
       change: function (event, ui) {
 
@@ -999,10 +815,12 @@ typeInput.style.fontWeight = 'bold';
 
 
     }).autocomplete("instance")._renderItem = function (ul, item) {
-
-      return $("<li>").append(`<div>${item.label}</div>`).appendTo(ul);
-
-    };
+    const highlightedLabel = highlightMatch(item.label, this.term);
+    // We now use item.item because we passed the full object
+    return $("<li>")
+        .append(`<div>${highlightedLabel}<br><small>UID: ${item.item.UID} | Stock: ${item.item.Stock}</small></div>`)
+        .appendTo(ul);
+};
 
   }
 
@@ -1173,6 +991,32 @@ document.getElementById("requisitionForm").addEventListener("keydown", function 
   
 
 document.getElementById("requisitionForm").addEventListener("submit", async function (e) {
+
+
+  // --- Validation Block ---
+let isValid = true;
+let validationErrors = [];
+document.querySelectorAll(".item-box").forEach((box, i) => {
+    const idx = i + 1;
+    const name = box.querySelector(`[name='name_${idx}']`).value.trim();
+    const quantity = parseFloat(box.querySelector(`[name='quantity_${idx}']`).value);
+
+    if (!name) { 
+        isValid = false; 
+        validationErrors.push(`Item #${idx}: Name is required.`); 
+    }
+    if (isNaN(quantity) || quantity <= 0) { 
+        isValid = false; 
+        validationErrors.push(`Item #${idx}: Quantity must be greater than 0.`); 
+    }
+});
+
+if (!isValid) {
+    alert("Please fix the following errors:\n\n" + validationErrors.join("\n"));
+    e.preventDefault(); // Stop the form submission
+    return; // Exit the function
+}
+// --- End Validation Block ---
 
   e.preventDefault();
 
