@@ -199,17 +199,43 @@ if (unitData && unitData.length > 0) {
     bindAutocomplete(itemCount);
 }
 
+function removeItemBox(button) {
+    button.closest('.item-box').remove();
+    updateItemControls(); // This will handle renumbering and buttons
+}
+    
 function updateItemControls() {
-    document.querySelectorAll(".item-box").forEach((box, idx, boxes) => {
-        const row = box.querySelector('.button-row');
-        row.innerHTML = '';
-        if (boxes.length > 1) {
-            row.innerHTML += '<button type="button" class="btn btn-outline-danger">− Remove Item</button>';
-            row.querySelector('.btn-outline-danger').addEventListener('click', (e) => e.target.closest('.item-box').remove());
+    const allItemBoxes = document.querySelectorAll(".item-box");
+
+    allItemBoxes.forEach((box, index) => {
+        // 1. Fix the item serial number
+        const title = box.querySelector('h5');
+        if (title) {
+            title.textContent = `Item #${index + 1}`;
         }
-        if (idx === boxes.length - 1) {
-            row.innerHTML += '<button type="button" class="btn btn-outline-primary ml-auto">+ Add Another Item</button>';
-            row.querySelector('.btn-outline-primary').addEventListener('click', addItemBox);
+
+        // 2. Manage the Add/Remove buttons
+        const buttonRow = box.querySelector('.button-row');
+        buttonRow.innerHTML = ''; // Clear existing buttons
+
+        // Add the "Remove" button if there is more than one item
+        if (allItemBoxes.length > 1) {
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-outline-danger';
+            removeBtn.innerText = '− Remove Item';
+            removeBtn.onclick = () => removeItemBox(removeBtn);
+            buttonRow.appendChild(removeBtn);
+        }
+
+        // Add the "Add" button ONLY to the very last item box
+        if (index === allItemBoxes.length - 1) {
+             const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'btn btn-outline-primary ml-auto';
+            addBtn.innerText = '+ Add Another Item';
+            addBtn.onclick = addItemBox;
+            buttonRow.appendChild(addBtn);
         }
     });
 }
@@ -237,10 +263,12 @@ function bindAutocomplete(index) {
             const unitSelect = box.querySelector(`[name='unit_${index}']`);
             unitSelect.value = item.Unit;
             unitSelect.readOnly = true;
+            
 
             const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
             priceInput.value = item.UnitPrice;
             priceInput.readOnly = true;
+            box.querySelector(`[name='vendor_${index}']`).value = item.Vendor;
             
             const gstSelect = box.querySelector(`[name='gst_${index}']`);
             gstSelect.value = item.GST * 100; // Convert 0.18 to 18
