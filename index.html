@@ -236,19 +236,16 @@ function bindAutocomplete(index) {
     const quantityInput = box.querySelector(`[name='quantity_${index}']`);
     const statusSpan = box.querySelector(`[name='item_status_${index}']`);
 
-    // FIX: Re-introducing the event listener for the quantity input
     quantityInput.addEventListener('input', () => {
-        // This check only runs for existing items that have a stock value stored
         if (statusSpan.dataset.stock) {
             const availableStock = parseFloat(statusSpan.dataset.stock);
             const requestedQty = parseFloat(quantityInput.value);
-
-            if (!isNaN(requestedQty) && requestedQty > availableStock) {
-                // Change color to pink if requested quantity is too high
-                statusSpan.style.color = 'hotpink';
-            } else {
-                // Revert to green if the quantity is valid or stock is available
-                statusSpan.style.color = 'green';
+            if (availableStock > 0) {
+                if (!isNaN(requestedQty) && requestedQty > availableStock) {
+                    statusSpan.style.color = 'hotpink';
+                } else {
+                    statusSpan.style.color = 'green';
+                }
             }
         }
     });
@@ -265,7 +262,6 @@ function bindAutocomplete(index) {
             box.querySelector(`[name='name_${index}']`).value = item.Name;
             box.querySelector(`[name='uid_${index}']`).value = item.UID;
             
-            // Store the stock quantity on the status element for later access
             statusSpan.dataset.stock = item.Stock || 0;
             const stockQty = parseFloat(item.Stock);
 
@@ -310,7 +306,7 @@ function bindAutocomplete(index) {
             if (!isKnownProduct) {
                 statusSpan.textContent = 'New';
                 statusSpan.style.color = '#dc3545';
-                delete statusSpan.dataset.stock; // Clear stored stock for new items
+                delete statusSpan.dataset.stock;
 
                 box.querySelector(`[name='uid_${index}']`).value = '';
                 box.querySelector(`[name='unitPrice_${index}']`).value = '';
@@ -347,6 +343,20 @@ function bindAutocomplete(index) {
         focus: function( event, ui ) {
             event.preventDefault();
             $(this).val(ui.item.value);
+        },
+        // FIX: This new 'change' event enforces the selection
+        change: function(event, ui) {
+            // If the user did not select an item from the list
+            if (!ui.item) {
+                const enteredValue = $(this).val();
+                // Check if the typed text is a valid option (case-insensitive)
+                const isValid = orderForData.some(item => normalize(item) === normalize(enteredValue));
+                
+                // If it's not a valid option, clear the field
+                if (!isValid) {
+                    $(this).val('');
+                }
+            }
         }
     }).autocomplete("instance")._renderItem = function(ul, item) {
         const highlightedLabel = highlightMatch(item.label, this.term);
