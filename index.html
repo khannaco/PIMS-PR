@@ -14,7 +14,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <style>
-        
         body { background-color: #f0f2f5; }
         .container { max-width: 1200px; background-color: #ffffff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .item-box { border: 1px solid #dee2e6; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; background-color: #f8f9fa; }
@@ -60,13 +59,15 @@
     </div>
 
 <script>
-
+// --- CONFIGURATION ---
 const SCRIPT_URL_GET_DATA = "https://script.google.com/macros/s/AKfycbzzA73rqV7QtHo-bbr7pbW3wUAc7XkWoJSEi7XljKGb2cjCZ1MKeYzK5zaxULbB5rD9QQ/exec";
 const SCRIPT_URL_POST_FORM = "ADD_YOUR_POST_SCRIPT_URL_HERE"; 
 
+// --- GLOBAL VARIABLES ---
 let itemCount = 0;
 let productData = [], employeeData = [], orderForData = [], unitData = [];
 
+// --- CORE LOGIC ---
 window.addEventListener("DOMContentLoaded", () => {
     fetchInitialData();
 });
@@ -133,6 +134,7 @@ function populateStaffDropdown(currentUser) {
     });
 }
 
+// --- ITEM BOX MANAGEMENT ---
 function addItemBox() {
     itemCount++;
     const container = document.getElementById("itemContainer");
@@ -140,43 +142,46 @@ function addItemBox() {
     itemBox.className = "item-box";
     itemBox.id = `item-box-${itemCount}`;
     
+    // Define date variables INSIDE the function
     const today = new Date();
     const defaultDate = new Date(today);
     defaultDate.setDate(today.getDate() + 7);
     const todayStr = today.toISOString().split("T")[0];
     const defaultDateStr = defaultDate.toISOString().split("T")[0];
 
+    // This new HTML fixes GST, Priority, Target Date, and locks fields by default
+    // This new HTML has the image preview moved to the second row and the first row re-balanced.
+// This final version uses absolute positioning for the image block
 itemBox.innerHTML = `
 <h5>Item - ${itemCount}</h5>
+
 <div class="form-row">
-    <div class="form-group col-md-1"><label>Type</label><input type="text" class="form-control" name="reqType_${itemCount}" readonly></div>
-    <div class="form-group col-md-2"><label>UID</label><input type="text" class="form-control" name="uid_${itemCount}" readonly></div>
-    <div class="form-group col-md-1"><label>Stock</label><input type="text" class="form-control" name="stock_${itemCount}" readonly></div>
-    <div class="form-group col-md-5"><label class="required">Name/Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div>
-    <div class="form-group col-md-1"><label class="required">R. Qty</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div>
-    <div class="form-group col-md-1"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required readonly></select></div>
-    <div class="form-group col-md-1"><label>U.Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any" readonly></div>
+<div class="form-group col-md-1"><label>Type</label><input type="text" class="form-control" name="reqType_${itemCount}" readonly></div>
+<div class="form-group col-md-2"><label>UID</label><input type="text" class="form-control" name="uid_${itemCount}" readonly></div>
+<div class="form-group col-md-5"><label class="required">Name/Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div>
+<div class="form-group col-md-1"><label class="required">R. Qty</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div>
+<div class="form-group col-md-1"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required readonly></select></div>
+<div class="form-group col-md-1"><label>Stock</label><input type="text" class="form-control" name="stock_${itemCount}" readonly></div>
+<div class="form-group col-md-1"><label>U.Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any" readonly></div>
 </div>
+
 <div class="form-row">
-    <div class="form-group col-md-3 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:120px; height:90px; display:flex; align-items-center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div>
-    <div class="form-group col-md-9">
-        <div class="form-row">
-            <div class="form-group col-md-3"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Important"><label class="form-check-label">Important</label></div></div></div>
-            <div class="form-group col-md-3"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required></div>
-            <div class="form-group col-md-2"><label>Total</label><input type="text" class="form-control" name="totalPrice_${itemCount}" readonly></div>
-            <div class="form-group col-md-2"><label>GST%</label><select class="form-control" name="gst_${itemCount}" readonly><option value="">N/A</option><option value="3">3%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></div>
-            <div class="form-group col-md-2"><label>Total(G)</label><input type="text" class="form-control" name="totalWithGst_${itemCount}" readonly></div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-4"><label class="required">Order For (Project/Client)</label><input type="text" class="form-control" name="orderFor_${itemCount}" required></div>
-            <div class="form-group col-md-4"><label>Suggested Vendor</label><input type="text" class="form-control" name="vendor_${itemCount}"></div>
-            <div class="form-group col-md-4"><label>Remarks</label><textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea></div>
-        </div>
-    </div>
+<div class="form-group col-md-2 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:120px; height:90px; display:flex; align-items:center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div>
+<div class="form-group col-md-6"><label class="required">Order For (Project/Client)</label><input type="text" class="form-control" name="orderFor_${itemCount}" required></div>
+<div class="form-group col-md-2"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required></div>
+<div class="form-group col-md-1"><label>Total</label><input type="text" class="form-control" name="totalPrice_${itemCount}" readonly></div>
+<div class="form-group col-md-1"><label>GST%</label><select class="form-control" name="gst_${itemCount}" readonly><option value="">N/A</option><option value="3">3%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></div>
 </div>
+
+<div class="form-row">
+<div class="form-group col-md-2"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Important"><label class="form-check-label">Important</label></div></div></div>
+<div class="form-group col-md-10"><label>Remarks</label><textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea></div>
+</div>
+
 <div class="button-row d-flex justify-content-between"></div>
 `;
     container.appendChild(itemBox);
+    // --- START: New code to populate Unit dropdown ---
 const unitSelect = itemBox.querySelector(`[name='unit_${itemCount}']`);
 if (unitData && unitData.length > 0) {
     unitData.forEach(unit => {
@@ -184,32 +189,36 @@ if (unitData && unitData.length > 0) {
         option.value = unit;
         option.textContent = unit;
         if (unit.toLowerCase() === 'pcs') {
-            option.selected = true;
+            option.selected = true; // Set 'pcs' as the default for new items
         }
         unitSelect.appendChild(option);
     });
 }
-
+// --- END: New code ---
     updateItemControls();
     bindAutocomplete(itemCount);
 }
 
 function removeItemBox(button) {
     button.closest('.item-box').remove();
-    updateItemControls(); 
+    updateItemControls(); // This will handle renumbering and buttons
 }
     
 function updateItemControls() {
     const allItemBoxes = document.querySelectorAll(".item-box");
 
     allItemBoxes.forEach((box, index) => {
+        // 1. Fix the item serial number
         const title = box.querySelector('h5');
         if (title) {
             title.textContent = `Item #${index + 1}`;
         }
-        const buttonRow = box.querySelector('.button-row');
-        buttonRow.innerHTML = ''; 
 
+        // 2. Manage the Add/Remove buttons
+        const buttonRow = box.querySelector('.button-row');
+        buttonRow.innerHTML = ''; // Clear existing buttons
+
+        // Add the "Remove" button if there is more than one item
         if (allItemBoxes.length > 1) {
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -219,6 +228,7 @@ function updateItemControls() {
             buttonRow.appendChild(removeBtn);
         }
 
+        // Add the "Add" button ONLY to the very last item box
         if (index === allItemBoxes.length - 1) {
              const addBtn = document.createElement('button');
             addBtn.type = 'button';
@@ -230,10 +240,12 @@ function updateItemControls() {
     });
 }
 
+// --- AUTOCOMPLETE & CALCULATIONS ---
 function bindAutocomplete(index) {
     const nameInput = $(`#item-box-${index} [name='name_${index}']`);
     nameInput.autocomplete({
         source: (request, response) => {
+            // This search logic is correct
             const matches = productData.filter(i => smartMatch(i.Name, request.term));
             response(matches.map(i => ({ label: i.Name, value: i.Name, item: i })));
         },
@@ -242,10 +254,12 @@ function bindAutocomplete(index) {
             const item = ui.item.item;
             const box = document.getElementById(`item-box-${index}`);
             
+            // --- This is the logic for REPEAT items ---
             box.querySelector(`[name='uid_${index}']`).value = item.UID;
             box.querySelector(`[name='name_${index}']`).value = item.Name;
             box.querySelector(`[name='stock_${index}']`).value = item.Stock;
             
+            // Populate and keep fields locked
             const unitSelect = box.querySelector(`[name='unit_${index}']`);
             unitSelect.value = item.Unit;
             unitSelect.readOnly = true;
@@ -257,7 +271,7 @@ function bindAutocomplete(index) {
             box.querySelector(`[name='vendor_${index}']`).value = item.Vendor;
             
             const gstSelect = box.querySelector(`[name='gst_${index}']`);
-            gstSelect.value = item.GST * 100; 
+            gstSelect.value = item.GST * 100; // Convert 0.18 to 18
             gstSelect.readOnly = true;
 
             const reqTypeInput = box.querySelector(`[name='reqType_${index}']`);
@@ -277,17 +291,21 @@ function bindAutocomplete(index) {
             return false;
         },
         change: (event, ui) => {
+            // This event fires if the user types something new (not from the list)
             if (!ui.item) {
                 const box = document.getElementById(`item-box-${index}`);
                 
+                // --- This is the logic for NEW items ---
                 const reqTypeInput = box.querySelector(`[name='reqType_${index}']`);
                 reqTypeInput.value = 'New';
                 reqTypeInput.classList.add('req-type-new');
                 
+                // Unlock the fields
                 box.querySelector(`[name='unit_${index}']`).readOnly = false;
                 box.querySelector(`[name='unitPrice_${index}']`).readOnly = false;
                 box.querySelector(`[name='gst_${index}']`).readOnly = false;
 
+                // Reset to defaults
                 box.querySelector(`[name='unit_${index}']`).value = 'pcs';
             }
         }
@@ -296,6 +314,7 @@ function bindAutocomplete(index) {
         return $("<li>").addClass("ui-menu-item").append(`<div>${highlightedLabel}<br><small>UID: ${item.item.UID} | Stock: ${item.item.Stock}</small></div>`).appendTo(ul);
     };
 
+    // This logic for the 'Order For' input is correct
     const orderInput = $(`#item-box-${index} [name='orderFor_${index}']`);
     orderInput.autocomplete({
         source: (request, response) => {
@@ -311,6 +330,7 @@ function bindAutocomplete(index) {
         return $("<li>").append(`<div>${highlightedLabel}</div>`).appendTo(ul);
     };
     
+    // Bind calculation triggers
     document.querySelector(`#item-box-${index} [name='quantity_${index}']`).addEventListener('input', () => calculateTotals(index));
     document.querySelector(`#item-box-${index} [name='unitPrice_${index}']`).addEventListener('input', () => calculateTotals(index));
     document.querySelector(`#item-box-${index} [name='gst_${index}']`).addEventListener('change', () => calculateTotals(index));
@@ -325,6 +345,7 @@ function calculateTotals(index) {
     box.querySelector(`[name='totalWithGst_${index}']`).value = ((qty * price) * (1 + gst / 100)).toFixed(2);
 }
 
+// --- UTILITY FUNCTIONS ---
 function normalize(str) { return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ''; }
 function smartMatch(text, term) { return normalize(term).split(/\s+/).filter(Boolean).every(word => normalize(text).includes(word)); }
 function highlightMatch(text, term) {
@@ -338,6 +359,7 @@ function highlightMatch(text, term) {
 }
 function parseJwt(token) { const base64Url = token.split('.')[1]; const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); return JSON.parse(jsonPayload); }
 
+// --- FORM SUBMISSION ---
 document.getElementById("requisitionForm").addEventListener("submit", function(e) {
     e.preventDefault();
     const submitBtn = this.querySelector("button[type='submit']");
