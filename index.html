@@ -135,7 +135,6 @@ function populateStaffDropdown(currentUser) {
     });
 }
 
-// --- ITEM BOX MANAGEMENT ---
 function addItemBox() {
     itemCount++;
     const container = document.getElementById("itemContainer");
@@ -149,7 +148,7 @@ function addItemBox() {
     const todayStr = today.toISOString().split("T")[0];
     const defaultDateStr = defaultDate.toISOString().split("T")[0];
 
-    // FIX 1 & 4: Removed GST/Total fields, converted inputs to auto-resizing textareas
+    // UPDATED: The 'readonly' attribute is removed from the Unit select tag
     itemBox.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Item ${itemCount}</h5>
@@ -232,31 +231,7 @@ function updateItemControls() {
 }
 
 function bindAutocomplete(index) {
-    const box = document.getElementById(`item-box-${index}`);
     const nameInput = $(`#item-box-${index} [name='name_${index}']`);
-    const quantityInput = box.querySelector(`[name='quantity_${index}']`);
-    const statusSpan = box.querySelector(`[name='item_status_${index}']`);
-
-    // NEW: Event listener for the quantity input field
-    quantityInput.addEventListener('input', () => {
-        // This check only runs for existing items that have a stock value stored
-        if (statusSpan.dataset.stock) {
-            const availableStock = parseFloat(statusSpan.dataset.stock);
-            const requestedQty = parseFloat(quantityInput.value);
-
-            // Only perform the color change logic if there is stock to compare against
-            if (availableStock > 0) {
-                if (!isNaN(requestedQty) && requestedQty > availableStock) {
-                    // FIX 2: Change color to pink if requested quantity is too high
-                    statusSpan.style.color = 'hotpink';
-                } else {
-                    // Revert to green if the quantity is valid
-                    statusSpan.style.color = 'green';
-                }
-            }
-        }
-    });
-
     nameInput.autocomplete({
         source: (request, response) => {
             const matches = productData.filter(i => smartMatch(i.Name, request.term));
@@ -265,23 +240,14 @@ function bindAutocomplete(index) {
         select: (event, ui) => {
             event.preventDefault();
             const item = ui.item.item;
+            const box = document.getElementById(`item-box-${index}`);
             
-            // --- Logic for REPEAT items ---
             box.querySelector(`[name='name_${index}']`).value = item.Name;
             box.querySelector(`[name='uid_${index}']`).value = item.UID;
             
-            // Store the stock quantity on the status element for later access
-            statusSpan.dataset.stock = item.Stock || 0;
-            const stockQty = parseFloat(item.Stock);
-
-            // FIX 1: Check if stock is blank or zero
-            if (stockQty > 0) {
-                statusSpan.innerHTML = `${item.Stock} ${item.Unit} in Stock`;
-                statusSpan.style.color = 'green';
-            } else {
-                statusSpan.innerHTML = 'Not Available in Store';
-                statusSpan.style.color = '#dc3545'; // Red color
-            }
+            const statusSpan = box.querySelector(`[name='item_status_${index}']`);
+            statusSpan.innerHTML = `${item.Stock} ${item.Unit} in Stock`;
+            statusSpan.style.color = 'green';
 
             const unitSelect = box.querySelector(`[name='unit_${index}']`);
             unitSelect.value = item.Unit;
@@ -315,10 +281,10 @@ function bindAutocomplete(index) {
 
             if (!isKnownProduct) {
                 const box = document.getElementById(`item-box-${index}`);
+                const statusSpan = box.querySelector(`[name='item_status_${index}']`);
                 statusSpan.textContent = 'New';
                 statusSpan.style.color = '#dc3545';
-                delete statusSpan.dataset.stock; // Clear stored stock for new items
-
+                
                 box.querySelector(`[name='uid_${index}']`).value = '';
                 box.querySelector(`[name='unitPrice_${index}']`).value = '';
                 box.querySelector(`[name='vendor_${index}']`).value = '';
@@ -326,6 +292,7 @@ function bindAutocomplete(index) {
 
                 const unitSelect = box.querySelector(`[name='unit_${index}']`);
                 unitSelect.disabled = false;
+                unitSelect.removeAttribute('readonly'); // FIX: Explicitly remove readonly
                 unitSelect.removeAttribute('tabindex');
 
                 const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
