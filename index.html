@@ -238,18 +238,20 @@ function bindAutocomplete(index) {
             response(matches.map(i => ({ label: i.Name, value: i.Name, item: i })));
         },
         select: (event, ui) => {
-            event.preventDefault();
+            // This event fires when a user clicks an item from the dropdown.
+            // We will do ALL our logic here.
+            event.preventDefault(); // Stop the widget from doing anything else
             const item = ui.item.item;
             const box = document.getElementById(`item-box-${index}`);
             
+            // --- Logic for REPEAT items ---
             box.querySelector(`[name='uid_${index}']`).value = item.UID;
-            box.querySelector(`[name='name_${index}']`).value = item.Name;
+            box.querySelector(`[name='name_${index}']`).value = item.Name; // Manually set the input value
             box.querySelector(`[name='stock_${index}']`).value = item.Stock;
             
             const unitSelect = box.querySelector(`[name='unit_${index}']`);
             unitSelect.value = item.Unit;
             unitSelect.readOnly = true;
-            
 
             const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
             priceInput.value = item.UnitPrice;
@@ -277,17 +279,22 @@ function bindAutocomplete(index) {
             return false;
         },
         change: (event, ui) => {
+            // This event now ONLY handles the case where the user types something
+            // and clicks away WITHOUT selecting from the dropdown.
             if (!ui.item) {
                 const box = document.getElementById(`item-box-${index}`);
                 
+                // --- Logic for NEW items ---
                 const reqTypeInput = box.querySelector(`[name='reqType_${index}']`);
                 reqTypeInput.value = 'New';
                 reqTypeInput.classList.add('req-type-new');
                 
+                // Unlock fields for manual entry
                 box.querySelector(`[name='unit_${index}']`).readOnly = false;
                 box.querySelector(`[name='unitPrice_${index}']`).readOnly = false;
                 box.querySelector(`[name='gst_${index}']`).readOnly = false;
 
+                // Set default unit for new items
                 box.querySelector(`[name='unit_${index}']`).value = 'pcs';
             }
         }
@@ -296,6 +303,7 @@ function bindAutocomplete(index) {
         return $("<li>").addClass("ui-menu-item").append(`<div>${highlightedLabel}<br><small>UID: ${item.item.UID} | Stock: ${item.item.Stock}</small></div>`).appendTo(ul);
     };
 
+    // This logic for the 'Order For' input is correct
     const orderInput = $(`#item-box-${index} [name='orderFor_${index}']`);
     orderInput.autocomplete({
         source: (request, response) => {
@@ -311,6 +319,7 @@ function bindAutocomplete(index) {
         return $("<li>").append(`<div>${highlightedLabel}</div>`).appendTo(ul);
     };
     
+    // Bind calculation triggers
     document.querySelector(`#item-box-${index} [name='quantity_${index}']`).addEventListener('input', () => calculateTotals(index));
     document.querySelector(`#item-box-${index} [name='unitPrice_${index}']`).addEventListener('input', () => calculateTotals(index));
     document.querySelector(`#item-box-${index} [name='gst_${index}']`).addEventListener('change', () => calculateTotals(index));
