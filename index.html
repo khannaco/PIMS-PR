@@ -232,7 +232,31 @@ function updateItemControls() {
 }
 
 function bindAutocomplete(index) {
+    const box = document.getElementById(`item-box-${index}`);
     const nameInput = $(`#item-box-${index} [name='name_${index}']`);
+    const quantityInput = box.querySelector(`[name='quantity_${index}']`);
+    const statusSpan = box.querySelector(`[name='item_status_${index}']`);
+
+    // NEW: Event listener for the quantity input field
+    quantityInput.addEventListener('input', () => {
+        // This check only runs for existing items that have a stock value stored
+        if (statusSpan.dataset.stock) {
+            const availableStock = parseFloat(statusSpan.dataset.stock);
+            const requestedQty = parseFloat(quantityInput.value);
+
+            // Only perform the color change logic if there is stock to compare against
+            if (availableStock > 0) {
+                if (!isNaN(requestedQty) && requestedQty > availableStock) {
+                    // FIX 2: Change color to pink if requested quantity is too high
+                    statusSpan.style.color = 'hotpink';
+                } else {
+                    // Revert to green if the quantity is valid
+                    statusSpan.style.color = 'green';
+                }
+            }
+        }
+    });
+
     nameInput.autocomplete({
         source: (request, response) => {
             const matches = productData.filter(i => smartMatch(i.Name, request.term));
@@ -241,19 +265,27 @@ function bindAutocomplete(index) {
         select: (event, ui) => {
             event.preventDefault();
             const item = ui.item.item;
-            const box = document.getElementById(`item-box-${index}`);
             
             // --- Logic for REPEAT items ---
             box.querySelector(`[name='name_${index}']`).value = item.Name;
             box.querySelector(`[name='uid_${index}']`).value = item.UID;
             
-            const statusSpan = box.querySelector(`[name='item_status_${index}']`);
-            statusSpan.innerHTML = `${item.Stock} ${item.Unit} in Stock`;
-            statusSpan.style.color = 'green';
+            // Store the stock quantity on the status element for later access
+            statusSpan.dataset.stock = item.Stock || 0;
+            const stockQty = parseFloat(item.Stock);
+
+            // FIX 1: Check if stock is blank or zero
+            if (stockQty > 0) {
+                statusSpan.innerHTML = `${item.Stock} ${item.Unit} in Stock`;
+                statusSpan.style.color = 'green';
+            } else {
+                statusSpan.innerHTML = 'Not Available in Store';
+                statusSpan.style.color = '#dc3545'; // Red color
+            }
 
             const unitSelect = box.querySelector(`[name='unit_${index}']`);
             unitSelect.value = item.Unit;
-            unitSelect.disabled = true; // FIX 2: Use 'disabled' for select elements
+            unitSelect.disabled = true;
             unitSelect.setAttribute('tabindex', '-1');
 
             const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
@@ -263,7 +295,7 @@ function bindAutocomplete(index) {
             
             const vendorInput = box.querySelector(`[name='vendor_${index}']`);
             vendorInput.value = item.Vendor;
-            vendorInput.readOnly = true; // FIX 2: Lock the vendor field
+            vendorInput.readOnly = true;
             vendorInput.setAttribute('tabindex', '-1');
             
             const img = box.querySelector(`[name='image_${index}']`);
@@ -283,21 +315,17 @@ function bindAutocomplete(index) {
 
             if (!isKnownProduct) {
                 const box = document.getElementById(`item-box-${index}`);
-                
-                // --- Logic for NEW items ---
-                const statusSpan = box.querySelector(`[name='item_status_${index}']`);
                 statusSpan.textContent = 'New';
                 statusSpan.style.color = '#dc3545';
-                
-                // FIX 1: Clear old data when item becomes new
+                delete statusSpan.dataset.stock; // Clear stored stock for new items
+
                 box.querySelector(`[name='uid_${index}']`).value = '';
                 box.querySelector(`[name='unitPrice_${index}']`).value = '';
                 box.querySelector(`[name='vendor_${index}']`).value = '';
                 box.querySelector(`[name='image_${index}']`).style.display = 'none';
 
-                // Unlock fields and make them tabbable again
                 const unitSelect = box.querySelector(`[name='unit_${index}']`);
-                unitSelect.disabled = false; // FIX 2: Unlock the unit field
+                unitSelect.disabled = false;
                 unitSelect.removeAttribute('tabindex');
 
                 const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
@@ -305,7 +333,7 @@ function bindAutocomplete(index) {
                 priceInput.removeAttribute('tabindex');
                 
                 const vendorInput = box.querySelector(`[name='vendor_${index}']`);
-                vendorInput.readOnly = false; // FIX 2: Unlock the vendor field
+                vendorInput.readOnly = false;
                 vendorInput.removeAttribute('tabindex');
                 
                 unitSelect.value = 'pcs';
