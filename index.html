@@ -152,7 +152,7 @@ function addItemBox() {
     // FIX 1 & 4: Removed GST/Total fields, converted inputs to auto-resizing textareas
     itemBox.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Item #${itemCount}</h5>
+            <h5 class="mb-0">Item ${itemCount}</h5>
             <span class="h5 font-weight-bold" name="item_status_${itemCount}"></span>
         </div>
         <div class="form-row">
@@ -168,10 +168,10 @@ function addItemBox() {
             <div class="form-group col-md-6"><label class="required">Order For (Project/Client)</label><textarea class="form-control autoresize" name="orderFor_${itemCount}" required rows="1" oninput="autoResize(this)"></textarea></div>
         </div>
         <div class="form-row">
-        <div class="form-group col-md-3"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Important" checked><label class="form-check-label">Important</label></div></div></div>
-            <div class="form-group col-md-3"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required></div>
+        <div class="form-group col-md-2"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Important" checked><label class="form-check-label">Important</label></div></div></div>
+            <div class="form-group col-md-2"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required></div>
             
-            <div class="form-group col-md-6"><label>Remarks</label><textarea class="form-control autoresize" name="remarks_${itemCount}" rows="1" oninput="autoResize(this)"></textarea></div>
+            <div class="form-group col-md-8"><label>Remarks</label><textarea class="form-control autoresize" name="remarks_${itemCount}" rows="1" oninput="autoResize(this)"></textarea></div>
         </div>
         <div class="button-row d-flex justify-content-between"></div>
     `;
@@ -204,7 +204,7 @@ function updateItemControls() {
     allItemBoxes.forEach((box, index) => {
         const title = box.querySelector('h5');
         if (title) {
-            title.textContent = `Item #${index + 1}`;
+            title.textContent = `Item ${index + 1}`;
         }
         const buttonRow = box.querySelector('.button-row');
         buttonRow.innerHTML = ''; 
@@ -227,7 +227,6 @@ function updateItemControls() {
     });
 }
 
-// FIX 3 & 5: Updated autocomplete with robust locking and tab control
 function bindAutocomplete(index) {
     const nameInput = $(`#item-box-${index} [name='name_${index}']`);
     nameInput.autocomplete({
@@ -240,6 +239,7 @@ function bindAutocomplete(index) {
             const item = ui.item.item;
             const box = document.getElementById(`item-box-${index}`);
             
+            // --- Logic for REPEAT items ---
             box.querySelector(`[name='name_${index}']`).value = item.Name;
             box.querySelector(`[name='uid_${index}']`).value = item.UID;
             
@@ -249,7 +249,7 @@ function bindAutocomplete(index) {
 
             const unitSelect = box.querySelector(`[name='unit_${index}']`);
             unitSelect.value = item.Unit;
-            unitSelect.readOnly = true;
+            unitSelect.disabled = true; // FIX 2: Use 'disabled' for select elements
             unitSelect.setAttribute('tabindex', '-1');
 
             const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
@@ -257,7 +257,10 @@ function bindAutocomplete(index) {
             priceInput.readOnly = true;
             priceInput.setAttribute('tabindex', '-1');
             
-            box.querySelector(`[name='vendor_${index}']`).value = item.Vendor;
+            const vendorInput = box.querySelector(`[name='vendor_${index}']`);
+            vendorInput.value = item.Vendor;
+            vendorInput.readOnly = true; // FIX 2: Lock the vendor field
+            vendorInput.setAttribute('tabindex', '-1');
             
             const img = box.querySelector(`[name='image_${index}']`);
             if (item.ImageLink && item.ImageLink.includes('drive.google.com')) {
@@ -276,17 +279,30 @@ function bindAutocomplete(index) {
 
             if (!isKnownProduct) {
                 const box = document.getElementById(`item-box-${index}`);
+                
+                // --- Logic for NEW items ---
                 const statusSpan = box.querySelector(`[name='item_status_${index}']`);
                 statusSpan.textContent = 'New';
                 statusSpan.style.color = '#dc3545';
                 
+                // FIX 1: Clear old data when item becomes new
+                box.querySelector(`[name='uid_${index}']`).value = '';
+                box.querySelector(`[name='unitPrice_${index}']`).value = '';
+                box.querySelector(`[name='vendor_${index}']`).value = '';
+                box.querySelector(`[name='image_${index}']`).style.display = 'none';
+
+                // Unlock fields and make them tabbable again
                 const unitSelect = box.querySelector(`[name='unit_${index}']`);
-                unitSelect.readOnly = false;
+                unitSelect.disabled = false; // FIX 2: Unlock the unit field
                 unitSelect.removeAttribute('tabindex');
 
                 const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
                 priceInput.readOnly = false;
                 priceInput.removeAttribute('tabindex');
+                
+                const vendorInput = box.querySelector(`[name='vendor_${index}']`);
+                vendorInput.readOnly = false; // FIX 2: Unlock the vendor field
+                vendorInput.removeAttribute('tabindex');
                 
                 unitSelect.value = 'pcs';
             }
@@ -312,8 +328,6 @@ function bindAutocomplete(index) {
     };
 }
 
-// --- UTILITY FUNCTIONS ---
-// FIX 4: Function to auto-resize textareas
 function autoResize(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
@@ -331,7 +345,7 @@ function highlightMatch(text, term) {
 }
 function parseJwt(token) { const base64Url = token.split('.')[1]; const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); return JSON.parse(jsonPayload); }
 
-// --- FORM SUBMISSION ---
+
 document.getElementById("requisitionForm").addEventListener("submit", function(e) {
     e.preventDefault();
     const submitBtn = this.querySelector("button[type='submit']");
@@ -339,9 +353,9 @@ document.getElementById("requisitionForm").addEventListener("submit", function(e
     let validationErrors = [];
     document.querySelectorAll(".item-box").forEach((box, i) => {
         const idx = i + 1;
-        if (!box.querySelector(`[name='name_${idx}']`).value.trim()) { isValid = false; validationErrors.push(`Item #${idx}: Name is required.`); }
+        if (!box.querySelector(`[name='name_${idx}']`).value.trim()) { isValid = false; validationErrors.push(`Item ${idx}: Name is required.`); }
         const qty = parseFloat(box.querySelector(`[name='quantity_${idx}']`).value);
-        if (isNaN(qty) || qty <= 0) { isValid = false; validationErrors.push(`Item #${idx}: Quantity must be greater than 0.`); }
+        if (isNaN(qty) || qty <= 0) { isValid = false; validationErrors.push(`Item ${idx}: Quantity must be greater than 0.`); }
     });
 
     if (!isValid) {
