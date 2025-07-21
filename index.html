@@ -139,54 +139,53 @@ function addItemBox() {
     const todayStr = today.toISOString().split("T")[0];
     const defaultDateStr = defaultDate.toISOString().split("T")[0];
 
-itemBox.innerHTML = `
-<div class="form-row">
-  <div class="form-group col-md-11"><label><h5>Item - ${itemCount}</h5></label> </div>
-  <div class="form-group col-md-1"><input type="text" class="form-control" name="reqType_${itemCount}" readonly></div>
-</div>
+    // This new HTML has the updated header and removed fields
+    itemBox.innerHTML = `
+        <!-- NEW: Dynamic Header Row -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Item #${itemCount}</h5>
+            <span class="font-weight-bold" name="item_status_${itemCount}"></span>
+        </div>
 
-<div class="form-row">
-    <div class="form-group col-md-2"><label>UID</label><input type="text" class="form-control" name="uid_${itemCount}" readonly></div>
-    <div class="form-group col-md-6"><label class="required">Name/Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div>
-    <div class="form-group col-md-1"><label class="required">R. Qty</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div>
-    <div class="form-group col-md-1"><label>U.Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any" readonly></div>
-    <div class="form-group col-md-1"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required readonly></select></div>
-    <div class="form-group col-md-1"><label>Stock</label><input type="text" class="form-control" name="stock_${itemCount}" readonly></div>
-</div>
-
-<div class="form-row">
-    <div class="form-group col-md-2 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:120px; height:80px; display:flex; align-items-center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div>
-    <div class="form-group col-md-3"><label>Suggested Vendor</label><input type="text" class="form-control" name="vendor_${itemCount}"></div>
-<div class="form-group col-md-5">
-  <div class="form-row">
-    <div class="form-group col-md-6"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Important"><label class="form-check-label">Important</label></div></div></div>
-    <div class="form-group col-md-6"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required></div>
-</div>
-</div>
-    <div class="form-group col-md-1"><label>Total</label><input type="text" class="form-control" name="totalPrice_${itemCount}" readonly></div>
-    <div class="form-group col-md-1"><label>GST%</label><select class="form-control" name="gst_${itemCount}" readonly><option value="">N/A</option><option value="3">3%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></div>
-</div>
-
-<div class="form-row">
-    <div class="form-group col-md-6"><label class="required">Order For (Project/Client)</label><input type="text" class="form-control" name="orderFor_${itemCount}" required></div>
-    <div class="form-group col-md-6"><label>Remarks</label><textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea></div>
-</div>
-
-<div class="button-row d-flex justify-content-between"></div>
-`;
+        <!-- First Row (Type and Stock fields removed) -->
+        <div class="form-row">
+            <div class="form-group col-md-2"><label>UID</label><input type="text" class="form-control" name="uid_${itemCount}" readonly></div>
+            <div class="form-group col-md-6"><label class="required">Name/Description</label><input type="text" class="form-control" name="name_${itemCount}" required></div>
+            <div class="form-group col-md-1"><label class="required">Unit</label><select class="form-control" name="unit_${itemCount}" required readonly></select></div>
+            <div class="form-group col-md-2"><label class="required">R. Qty</label><input type="number" class="form-control" name="quantity_${itemCount}" step="any" required></div>
+            <div class="form-group col-md-1"><label>U.Price</label><input type="number" class="form-control" name="unitPrice_${itemCount}" step="any" readonly></div>
+        </div>
+        <!-- Second Row -->
+        <div class="form-row">
+            <div class="form-group col-md-2 d-flex justify-content-center align-items-end"><div style="border:1px solid #ddd; border-radius:4px; width:120px; height:80px; display:flex; align-items-center; justify-content:center; background-color:#f8f9fa;"><img name="image_${itemCount}" style="max-width:100%; max-height:100%; display:none;"></div></div>
+            <div class="form-group col-md-3"><label>Suggested Vendor</label><input type="text" class="form-control" name="vendor_${itemCount}"></div>
+            <div class="form-group col-md-3"><label>Priority</label><div class="pt-2"><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Urgent"><label class="form-check-label">Urgent</label></div><div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="priority_${itemCount}" value="Important" checked><label class="form-check-label">Important</label></div></div></div>
+            <div class="form-group col-md-2"><label class="required">Target Date</label><input type="date" class="form-control" name="neededBy_${itemCount}" min="${todayStr}" value="${defaultDateStr}" required></div>
+            <div class="form-group col-md-1"><label>Total</label><input type="text" class="form-control" name="totalPrice_${itemCount}" readonly></div>
+            <div class="form-group col-md-1"><label>GST%</label><select class="form-control" name="gst_${itemCount}" readonly><option value="">N/A</option><option value="3">3%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></div>
+        </div>
+        <!-- Third Row -->
+        <div class="form-row">
+            <div class="form-group col-md-6"><label class="required">Order For (Project/Client)</label><input type="text" class="form-control" name="orderFor_${itemCount}" required></div>
+            <div class="form-group col-md-6"><label>Remarks</label><textarea class="form-control" name="remarks_${itemCount}" rows="1"></textarea></div>
+        </div>
+        <div class="button-row d-flex justify-content-between"></div>
+    `;
     container.appendChild(itemBox);
-const unitSelect = itemBox.querySelector(`[name='unit_${itemCount}']`);
-if (unitData && unitData.length > 0) {
-    unitData.forEach(unit => {
-        const option = document.createElement('option');
-        option.value = unit;
-        option.textContent = unit;
-        if (unit.toLowerCase() === 'pcs') {
-            option.selected = true;
-        }
-        unitSelect.appendChild(option);
-    });
-}
+
+    // This part remains the same
+    const unitSelect = itemBox.querySelector(`[name='unit_${itemCount}']`);
+    if (unitData && unitData.length > 0) {
+        unitData.forEach(unit => {
+            const option = document.createElement('option');
+            option.value = unit;
+            option.textContent = unit;
+            if (unit.toLowerCase() === 'pcs') {
+                option.selected = true;
+            }
+            unitSelect.appendChild(option);
+        });
+    }
 
     updateItemControls();
     bindAutocomplete(itemCount);
@@ -203,7 +202,7 @@ function updateItemControls() {
     allItemBoxes.forEach((box, index) => {
         const title = box.querySelector('h5');
         if (title) {
-            title.textContent = `Item-${index + 1}`;
+            title.textContent = `Item ${index + 1}`;
         }
         const buttonRow = box.querySelector('.button-row');
         buttonRow.innerHTML = ''; 
@@ -243,28 +242,28 @@ function bindAutocomplete(index) {
             // --- Logic for REPEAT items ---
             box.querySelector(`[name='name_${index}']`).value = item.Name;
             box.querySelector(`[name='uid_${index}']`).value = item.UID;
-            box.querySelector(`[name='stock_${index}']`).value = item.Stock;
             
+            // NEW: Update the status header
+            const statusSpan = box.querySelector(`[name='item_status_${index}']`);
+            statusSpan.innerHTML = `${item.Stock} ${item.Unit} in Stock`;
+            statusSpan.style.color = 'green';
+
             const unitSelect = box.querySelector(`[name='unit_${index}']`);
             unitSelect.value = item.Unit;
             unitSelect.readOnly = true;
-            unitSelect.setAttribute('tabindex', '-1'); // FIX: Make field untabbable
+            unitSelect.setAttribute('tabindex', '-1');
 
             const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
             priceInput.value = item.UnitPrice;
             priceInput.readOnly = true;
-            priceInput.setAttribute('tabindex', '-1'); // FIX: Make field untabbable
+            priceInput.setAttribute('tabindex', '-1');
             
             box.querySelector(`[name='vendor_${index}']`).value = item.Vendor;
             
             const gstSelect = box.querySelector(`[name='gst_${index}']`);
             gstSelect.value = item.GST * 100;
             gstSelect.readOnly = true;
-            gstSelect.setAttribute('tabindex', '-1'); // FIX: Make field untabbable
-
-            const reqTypeInput = box.querySelector(`[name='reqType_${index}']`);
-            reqTypeInput.value = 'Repeat';
-            reqTypeInput.classList.remove('req-type-new');
+            gstSelect.setAttribute('tabindex', '-1');
             
             const img = box.querySelector(`[name='image_${index}']`);
             if (item.ImageLink && item.ImageLink.includes('drive.google.com')) {
@@ -279,34 +278,30 @@ function bindAutocomplete(index) {
             return false;
         },
         change: (event, ui) => {
-            // FIX: This logic is now more robust to prevent the bug
-            if (ui.item) {
-                return; // An item was selected, do nothing.
-            }
+            if (ui.item) { return; }
 
-            // If we are here, the user typed something and clicked away.
-            // We must check if their text matches a known product.
             const currentText = $(event.target).val();
             const isKnownProduct = productData.some(p => p.Name === currentText);
 
             if (!isKnownProduct) {
                 const box = document.getElementById(`item-box-${index}`);
-                const reqTypeInput = box.querySelector(`[name='reqType_${index}']`);
-                reqTypeInput.value = 'New';
-                reqTypeInput.classList.add('req-type-new');
                 
-                // Unlock fields and make them tabbable again
+                // NEW: Update the status header
+                const statusSpan = box.querySelector(`[name='item_status_${index}']`);
+                statusSpan.textContent = 'New';
+                statusSpan.style.color = '#dc3545'; // Red color
+                
                 const unitSelect = box.querySelector(`[name='unit_${index}']`);
                 unitSelect.readOnly = false;
-                unitSelect.removeAttribute('tabindex'); // FIX: Make tabbable
+                unitSelect.removeAttribute('tabindex');
 
                 const priceInput = box.querySelector(`[name='unitPrice_${index}']`);
                 priceInput.readOnly = false;
-                priceInput.removeAttribute('tabindex'); // FIX: Make tabbable
+                priceInput.removeAttribute('tabindex');
                 
                 const gstSelect = box.querySelector(`[name='gst_${index}']`);
                 gstSelect.readOnly = false;
-                gstSelect.removeAttribute('tabindex'); // FIX: Make tabbable
+                gstSelect.removeAttribute('tabindex');
                 
                 unitSelect.value = 'pcs';
             }
@@ -316,6 +311,7 @@ function bindAutocomplete(index) {
         return $("<li>").addClass("ui-menu-item").append(`<div>${highlightedLabel}<br><small>UID: ${item.item.UID} | Stock: ${item.item.Stock}</small></div>`).appendTo(ul);
     };
 
+    // This logic remains the same
     const orderInput = $(`#item-box-${index} [name='orderFor_${index}']`);
     orderInput.autocomplete({
         source: (request, response) => {
