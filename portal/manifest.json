@@ -1,0 +1,15 @@
+{
+  "name": "Team AEPL",
+  "short_name": "AEPL",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#EAB308",
+  "theme_color": "#EAB308",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5968/5968534.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
