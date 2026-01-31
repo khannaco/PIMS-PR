@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team AEPL Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .active-tab { color: #EAB308; border-top: 3px solid #EAB308; background-color: #FEFCE8; }
+        body { background-color: #F3F4F6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .grid-icon { transition: transform 0.1s; }
+        .grid-icon:active { transform: scale(0.9); }
+    </style>
+</head>
+<body class="pb-24">
+
+    <div id="loadingSpinner" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mb-4"></div>
+        <strong style="font-size:1.2em;">Verifying Access...</strong>
+    </div>
+
+    <div id="login-screen" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[8888]">
+        <div class="bg-yellow-500 w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <i class="fa-solid fa-users text-white text-4xl"></i>
+        </div>
+        <h1 class="text-2xl font-bold mb-2 text-gray-800">Team AEPL</h1>
+        <p class="text-gray-500 mb-8">Authorized Personnel Only</p>
+        
+        <div id="g_id_onload"
+             data-client_id="631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com"
+             data-context="signin"
+             data-callback="handleCredentialResponse">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-size="large" data-shape="pill"></div>
+        <p id="error-msg" class="mt-6 text-red-500 hidden font-medium text-center px-6"></p>
+    </div>
+
+    <header class="bg-yellow-500 pt-8 pb-4 px-6 sticky top-0 shadow-lg z-40">
+        <div class="flex justify-between items-center mb-4">
+            <h1 id="page-title" class="text-white text-2xl font-black tracking-tight">Team Links</h1>
+            <div id="user-display" class="text-white text-xs opacity-80"></div>
+        </div>
+        <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
+            <input type="text" id="search" oninput="render()" placeholder="Search tools or contacts..." 
+                   class="w-full pl-10 pr-4 py-2 rounded-xl border-none focus:ring-4 focus:ring-yellow-300 shadow-inner">
+        </div>
+    </header>
+
+    <main id="content" class="p-4 grid grid-cols-3 gap-4 auto-rows-max">
+        </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t flex justify-around p-2 pb-6 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-50">
+        <button onclick="switchTab('hr')" class="flex flex-col items-center py-2 px-4 rounded-lg text-gray-400 nav-btn transition-all" id="btn-hr">
+            <i class="fa-solid fa-compass-drafting text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Links</span>
+        </button>
+        <button onclick="switchTab('domains')" class="flex flex-col items-center py-2 px-4 rounded-lg text-gray-400 nav-btn transition-all" id="btn-domains">
+            <i class="fa-solid fa-layer-group text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Domains</span>
+        </button>
+        <button onclick="switchTab('contacts')" class="flex flex-col items-center py-2 px-4 rounded-lg text-gray-400 nav-btn transition-all" id="btn-contacts">
+            <i class="fa-solid fa-address-book text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Staff</span>
+        </button>
+    </nav>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwG3q7eAyI_-M40RTm4uqSYNJ_lIEvygNnk2r7W20g5gVZHPBb9O8CekckdcTPTbIO23w/exec';
+        let appData = { hr: [], domains: [], contacts: [] };
+        let currentTab = 'hr';
+
+        // JWT Parser from your Requisition App
+        function parseJwt(token) { 
+            const base64Url = token.split('.')[1]; 
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); 
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))); 
+        }
+
+        async function handleCredentialResponse(response) {
+            const decoded = parseJwt(response.credential);
+            document.getElementById('loadingSpinner').style.display = 'flex';
+            await fetchData(decoded.email);
+        }
+
+        async function fetchData(email) {
+            try {
+                const res = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+                const data = await res.json();
+                
+                if (data.error) {
+                    showError("Access Denied: " + email + " is not authorized.");
+                } else {
+                    appData = data;
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('user-display').innerText = email;
+                    render();
+                }
+            } catch (err) {
+                showError("Connection Error. Please check your internet.");
+            } finally {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+
+        function showError(msg) {
+            const errEl = document.getElementById('error-msg');
+            errEl.innerText = msg;
+            errEl.classList.remove('hidden');
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const titles = { hr: 'Team Links', domains: 'Business Domains', contacts: 'Staff Directory' };
+            document.getElementById('page-title').innerText = titles[tab];
+            document.getElementById('search').value = '';
+            render();
+        }
+
+        function render() {
+            const container = document.getElementById('content');
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            container.innerHTML = '';
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab'));
+            document.getElementById(`btn-${currentTab}`).classList.add('active-tab');
+
+            if (currentTab === 'contacts') {
+                container.className = "p-4 space-y-3 block";
+                const filtered = appData.contacts.filter(c => c.Name.toLowerCase().includes(searchTerm));
+                filtered.forEach(c => {
+                    container.innerHTML += `
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center animate-in fade-in slide-in-from-bottom-2">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-bold">${c.Name.charAt(0)}</div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-sm">${c.Name}</h3>
+                                    <p class="text-[11px] text-gray-400 uppercase font-semibold">${c.Designation || 'Staff'}</p>
+                                </div>
+                            </div>
+                            <a href="https://wa.me/${c.Mobile || c.Whatsapp}" class="w-10 h-10 bg-green-50 text-green-500 rounded-full flex items-center justify-center shadow-inner">
+                                <i class="fa-brands fa-whatsapp text-xl"></i>
+                            </a>
+                        </div>`;
+                });
+            } else {
+                container.className = "p-4 grid grid-cols-3 gap-6";
+                const list = currentTab === 'hr' ? appData.hr : appData.domains;
+                const filtered = list.filter(item => (item['Task Name'] || item['Domain Name'] || '').toLowerCase().includes(searchTerm));
+                
+                filtered.forEach(item => {
+                    const name = item['Task Name'] || item['Domain Name'];
+                    const url = item.Url || item.URL1;
+                    container.innerHTML += `
+                        <a href="${url}" target="_blank" class="grid-icon flex flex-col items-center text-center group">
+                            <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gray-50 mb-2 group-hover:shadow-md transition-shadow">
+                                <i class="fa-solid fa-file-circle-check text-2xl text-yellow-500"></i>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-600 leading-tight uppercase tracking-tighter">${name}</span>
+                        </a>`;
+                });
+            }
+        }
+
+        // Initialize GSI if not already loaded
+        window.onload = () => {
+            if (typeof google !== 'undefined') {
+                google.accounts.id.initialize({
+                    client_id: "631503031767-svs2t8ebq2169ruq7n7ehq5ln8ig78qd.apps.googleusercontent.com",
+                    callback: handleCredentialResponse
+                });
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
